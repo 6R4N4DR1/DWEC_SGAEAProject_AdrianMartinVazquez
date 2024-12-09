@@ -1,11 +1,8 @@
 /**
- ╭-----------------------------------------------------------------------------------------------╮
- | SGAEA - Sistema de Gestión Académica de Estudiantes y Asignaturas                             |
- | Adrián Martín Vázquez 2º DAW AULA                                                           |
- |                                                                                               |
- | Github Pages: https://github.com/6R4N4DR1/DWEC_SGAEAProject_AdrianMartinVazquez/index.html
- | (Es necesario abrir la consola de las DevTools antes de cargar la página)                     |
- ╰-----------------------------------------------------------------------------------------------╯
+  SGAEA - Sistema de Gestión Académica de Estudiantes y Asignaturas
+  Adrián Martín Vázquez 2º DAW AULA
+  Github Pages: https://github.com/6R4N4DR1/DWEC_SGAEAProject_AdrianMartinVazquez/index.html
+  (Es necesario abrir la consola de las DevTools antes de cargar la página)
  */
 
 /**
@@ -23,98 +20,19 @@
  * Tiene un toString() que muestra el nombre y edad de la persona
  */
 class Persona{
-    #nombre;
-    #edad;
 
-    constructor(nombre, edad) {
-        if(nombre != null){
-            if(/^[a-zA-ZáéíóúüÁÉÍÓÚÜ\s]+$/.test(nombre)){
-                this.#nombre = nombre;
-            }else{
-                this.#nombre = "John Doe";
-            }
-        }else{
-            this.#nombre = "John Doe";
-        }
-
-        if(Number.isInteger(edad) && edad > 0 && edad <100){
-            this.#edad = edad
-        }else{
-            this.#edad = 0;
-        }
-      }
-
-    get nombre(){
-        return this.#nombre;
-    }
-
-    get edad(){
-        return this.#edad;
-    }
-    
-    toString() {
-    return `Nombre: ${this.nombre}, Edad: ${this.edad}`;
-    }
 }
 
  /**
- * 2.1.2 Clase Direccion
+ * Clase Direccion
  * 
  * La clase Direccion tiene los atributos calle, numero, piso, codigoPostal, provincia y localidad, todos son
  * tipo String y tienen getter. En el constructor se valida el código postal (5 números). Si no es válido, se
  * establecerá como "00000". Contiene un toString() que muestra todas las propiedades.
  */
 
-class Direccion{
-    #calle;
-    #numero;
-    #piso;
-    #codigoPostal;
-    #provincia;
-    #localidad;
-
-    constructor(calle, numero, piso, codigoPostal, provincia, localidad) {
-        this.#calle = calle;
-        this.#numero = numero;
-        this.#piso = piso;
-
-        if(typeof codigoPostal === 'string' && /^[0-9]{5}$/.test(codigoPostal)){
-            this.#codigoPostal = codigoPostal;
-        }else{
-            this.#codigoPostal = "00000";
-        }
-
-        this.#provincia = provincia;
-        this.#localidad = localidad;
-    }
-
-    get calle(){
-        return this.#calle;
-    }
-
-    get numero(){
-        return this.#numero;
-    }
-
-    get piso(){
-        return this.#piso;
-    }
-
-    get codigoPostal(){
-        return this.#codigoPostal;
-    }
-
-    get provincia(){
-        return this.#provincia;
-    }
-
-    get localidad(){
-        return this.#localidad;
-    }
+ class Direccion{
     
-    toString() {
-    return `${this.calle}, ${this.numero}, Piso: ${this.piso}, ${this.localidad}, ${this.provincia}, CP: ${this.codigoPostal}`;
-    }
 }
 
 /**
@@ -171,115 +89,11 @@ class Direccion{
  *      calificaciones de la asignatura mediante el método añadirCalificacion(). De lo contrario,
  *      devuelve un Error correspondiente.
  * 
- * + eliminarIdUsado(numero) (estático): Elimina numero del Array estático idsUsados.
+ * + eliminarIdUsado(id) (estático): Elimina id del Array estático idsUsados.
  */
 
 class Estudiante extends Persona{
-    #id;
-    #direccion;
-    #asignaturas;
-    #registros;
-    static #idsUsados = [];
-
-    constructor(nombre, edad, direccion) {
-        super(nombre, edad);
-        this.#id = this.generarId();
-        this.#direccion = direccion;
-        this.#asignaturas = [];
-        this.#registros = [];
-    }
-
-    generarId() {
-        let id;
-        do {
-        id = `E-${Math.floor(Math.random() * 10000)}`;
-        } while (Estudiante.#idsUsados.includes(id));
-        Estudiante.#idsUsados.push(id);
-        return id;
-    }
-
-    get id(){
-        return this.#id;
-    }
-
-    get direccion(){
-        return this.#direccion;
-    }
-
-    get asignaturas(){
-        return [...this.#asignaturas];
-    }
-
-    get registros(){
-        const log = [];
-
-        for(const reg of this.#registros){
-            const accion = reg[0];
-            const asignatura = reg[1];
-            const fecha = reg[2];
-
-            const diasESP = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-            const mesesESP = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const diaSemana = diasESP[fecha.getDay()];
-            const dia = fecha.getDate();
-            const mes = mesesESP[fecha.getMonth()];
-            const ano = fecha.getFullYear();
-            const fechaESP = `${diaSemana}, ${dia} de ${mes} de ${ano}`;
-
-            log.push(`${accion} en ${asignatura} el ${fechaESP}`);
-        }
-
-        return log;
-    }
-
-    matricular(asignatura) {
-        if (!this.#asignaturas.map(a => a[0].nombre).includes(asignatura.nombre)) {
-            this.#asignaturas.push([ asignatura, "Asignatura no evaluada" ]);
-            this.#registros.push(["Matriculación", asignatura.nombre, new Date()]);
-        }
-    }
-
-    desmatricular(asignatura) {
-        if(this.#asignaturas.map(a => a[0].nombre).includes(asignatura.nombre)){
-            this.#asignaturas = this.#asignaturas.filter(a => a[0].nombre !== asignatura.nombre);
-            this.#registros.push(["Desmatriculación", asignatura.nombre, new Date()]);
-        }
-    }
-
-    calificar(asignatura, nota) {
-        if(!this.#asignaturas.map(a => a[0].nombre).includes(asignatura.nombre)){
-            throw new Error("No hay estudiantes matriculados en esta asignatura");
-        }
-        if (nota < 0 || nota > 10){
-            throw new Error("La nota tiene que ser entre 0 y 10");
-        }
-
-        for(const asign of this.#asignaturas){
-            if(asign[0].nombre === asignatura.nombre){
-                asign[1] = parseFloat(nota).toFixed(2);
-                asignatura.ponerNota(nota);
-                break;
-            }
-        }
-    }
-
-    get promedio() {
-        const notas = this.#asignaturas.filter(a => typeof a[1] === 'number');
-
-        if(notas.length == 0){
-            return "Asignatura no evaluada";
-        }
-
-        return Math.round(notas.reduce((sumacc, asign) => sumacc += asign[1], 0) / notas.length);
-    }
-
-    static eliminarIdUsado(id){
-        Estudiante.#idsUsados = Estudiante.#idsUsados.filter(iU => iU !== id);
-    }
-
-    toString() {
-        return `${this.#id} -> ${super.toString()}`;
-    }
+   
 }
 
 /**
@@ -310,35 +124,9 @@ class Estudiante extends Persona{
  * + eliminarCalificacion(calificacion): Elimina una ocurrencia cualquiera de calificacion en el Array calificaciones.
  */
 
+// Clase para representar una asignatura
 class Asignatura{
-    #nombre;
-    #calificaciones;
-
-    constructor(nombre) {
-        if(/^[a-zA-ZáéíóúüÁÉÍÓÚÜ\sIV]+$/.test(nombre)){
-            this.#nombre = nombre;
-        }else{
-            this.#nombre = "Asignatura no especificada";
-        }
-
-        this.#calificaciones = [];
-    }
-
-    get nombre(){
-        return this.#nombre;
-    }
-
-    get promedio() {
-        if(this.#calificaciones.length === 0){
-            return "Asignatura no evaluada";
-        }else{
-            return Math.round(this.calificaciones.reduce((sumacc, nota) => sumacc + parseFloat(nota).toFixed(2), 0) / this.#calificaciones.length);
-        }
-    }
-
-    toString() {
-        return this.#nombre;
-    }
+    
 }
 
 /**
@@ -370,65 +158,9 @@ class Asignatura{
  * + busquedaEstudiantes(nombre): Array de los objetos Estudiante cuyos nombres incluyen el String nombre.
  */
 
+// Clase para representar la lista de estudiantes
 class ListaEstudiantes{
-    #listaEst;
-
-    constructor(...estudiantes) {
-        this.#listaEst = [];
-        for(const estudiante of estudiantes){
-            this.agregarEstudiante(estudiante);
-        }
-    }
-
-    agregarEstudiante(estudiante) {
-        if (this.#listaEst.filter(e => e.id === estudiante.id).length !== 0) {
-            throw new Error("El estudiante ya está en la lista.");
-        } else {
-            this.#listaEst.push(estudiante);
-            this.#listaEst.sort((est1, est2) => parseInt(est1.id.slice(1)) - parseInt(est2.id.slice(1)));
-        }
-    }
-
-    eliminarEstudiante(id) {
-        if (this.#listaEst.filter(e => e.id !== id).length === this.listaEst.length) {
-            throw new Error("No se encuentra ningún estudiante con este id en la lista");
-        }else{
-            this.#listaEst = this.#listaEst.filter(e => e.id !== id);
-            Estudiante.eliminarIdUsado(id.slice(1));
-        } 
-    }
-
-    buscarEstudiantes(nombre) {
-        return this.estudiantes.filter(e => e.nombre.toLowerCase().includes(nombre.toLowerCase()));
-    }
-
-    get promedioGeneral() {
-        const promedios = this.#listaEst.filter(e => !isNaN(e.promedio));
-        if(promedios.length === 0){
-            return "No están calificados";
-        }else{
-            return Math.round(promedios.reduce((sumacc, estudiante) => sumacc += parseFloat(estudiante.promedio).toFixed(2), 0) / promedios.length);
-        }
-    }
-
-    listaReportes(){
-        for(const liEst of this.#listaEst){
-            console.log(`Información del alumno con id: ${liEst.id}`);
-                console.log(`\tNombre: ${liEst.nombre}`);
-                console.log(`\tEdad: ${liEst.edad}`);
-                console.log(`\tDirección: ${liEst.direccion.toString()}`);
-            console.log(`Notas del alumno con id: ${liEst.id}`);
-                for(const asignatura of liEst.asignaturas){
-                    if(typeof asignatura[1] === 'string'){
-                        const notaPorAsignatura = asignatura[1];
-                    }else{
-                        const notaPorAsignatura = asignatura[1].toFixed(2);
-                    }
-
-                    console.log(`\t${asignatura[0].nombre} - Nota(s): ${notaPorAsignatura}`);
-                }
-        }
-    }
+    
 }
 
 /**
@@ -451,36 +183,9 @@ class ListaEstudiantes{
  * + busquedaAsignaturas(nombre): Array de los objetos Asignatura cuyos nombres incluyen el String nombre.
  */
 
+// Clase para representar la lista de asignaturas
 class ListaAsignaturas{
-    #listaAsign;
-
-    constructor(...asignaturas){
-        this.#listaAsign = [];
-
-        for(const asignatura of asignaturas){
-            this.agregarAsignatura(asignatura);
-        }
-    }
-
-    agregarAsignatura(asignatura) {
-        if (this.#listaAsign.filter(a => a.nombre === asignatura.nombre).length !== 0) {
-            throw new Error("La asignatura ya está en la lista");
-        } else {
-            this.#listaAsign.push(asignatura);
-        }
-    }
     
-    eliminarAsignatura(nombre) {
-        if(this.#listaAsign.filter(a => a.nombre === nombre).length === 0){
-            throw new Error("Dicha asignatura no se encuentra en la lista");
-        }else{
-            this.#listaAsign = this.#listaAsign.filter(a => a.nombre !== nombre);
-        }
-    }
-
-    buscarAsignaturas(nombre) {
-        return this.#listaAsign.filter(a => a.nombre.toLowerCase().includes(nombre.toLowerCase()));
-    }
 }
 
 /**
@@ -498,13 +203,6 @@ class ListaAsignaturas{
  * La variable eleccion será la variable que siempre obtenga el valor de window.prompt().
  */
 
-const listaDirecciones = [
-    new Direccion("Calle Falsa", 123, 1, "28001", "Madrid", "Madrid"),
-    new Direccion("Avenida Siempreviva", 742, 2, "28002", "Madrid", "Madrid"),
-    new Direccion("Gran Vía", 15, 3, "28003", "Madrid", "Madrid"),
-    new Direccion("Paseo del Prado", 34, 4, "28004", "Madrid", "Madrid"),
-    new Direccion("Calle Serrano", 85, 5, "28005", "Madrid", "Madrid"),
-];
 while(true){
 
     
