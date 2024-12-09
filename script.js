@@ -549,9 +549,9 @@ while(true){
     console.log("8. Promedio");
     console.log("9. Reporte");
 
-    elegir = Number.parseInt(window.prompt("¿Cuál eliges?:"));
+    elegir = Number.parseInt(window.prompt("¿Cuál eliges?: "));
 
     switch(elegir){
-        
+
     }
 }
