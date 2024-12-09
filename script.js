@@ -315,7 +315,7 @@ class Asignatura{
 
     // Metodo para eliminar una nota de un estudiante si esta dentro del array calificaciones
     eliminarCalificacion(nota){
-        const indiceCal = this.#calificaciones.indexOf(calificacion);
+        const indiceCal = this.#calificaciones.indexOf(nota);
 
         if(indiceCal === -1){
             throw new Error("Ningún estudiante tiene esa nota en la lista");
@@ -324,14 +324,9 @@ class Asignatura{
         }
     }
 
-    // Muestra un string diciendo el promedio de una asignatura, de lo contrario el promedio saldrá "Sin calificar"
+    // Muestra un string del nombre de cada asignatura
     toString() {
-        if(this.promedio !== "Asignatura no evaluada"){
-            const promedio = this.promedio
-        }else{
-            const promedio = "Sin calificar"
-        }
-        return `${this.#nombre} -> Media: ${promedio}`;
+        return this.#nombre;
     }
 }
 
@@ -353,7 +348,7 @@ class ListaEstudiantes{
 
     // Metodo para agregar un estudiante sino esta ya en la lista
     agregarEstudiante(estudiante) {
-        if (this.#listaEst.some(e => e.id === estudiante.id)) {
+        if (this.#listaEst.filter(e => e.id === estudiante.id).length != 0) {
             throw new Error("El estudiante ya está en la lista.");
         } else {
             this.#listaEst.push(estudiante);
@@ -367,7 +362,7 @@ class ListaEstudiantes{
         if (indiceEst === -1) {
             throw new Error("No se encuentra ningún estudiante con este id en la lista");
         }else{
-            this.#listaEst.splice(estudianteIndex, 1);
+            this.#listaEst.splice(indiceEst, 1);
             Estudiante.eliminarIdUsado(id);
         } 
     }
@@ -429,7 +424,7 @@ class ListaAsignaturas{
 
     // Agregar una asignatura a la lista si todavía no esta dentro
     agregarAsignatura(asignatura) {
-        if (this.#listaAsign.some(a => a.nombre === asignatura.nombre)) {
+        if (this.#listaAsign.filter(a => a.nombre === asignatura.nombre).length != 0) {
             throw new Error("La asignatura ya está en la lista");
         } else {
             this.#listaAsign.push(asignatura);
@@ -505,38 +500,58 @@ listaAsignaturas.agregarAsignatura(asignatura4);
 listaAsignaturas.agregarAsignatura(asignatura5);
 
 // Matriculación de estudiantes en algunas asignaturas
-ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura1]);
-ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura2]);
-ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura3]);
-ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura4]);
-ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura5]);
+ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[0]);
+ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[1]);
+ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[2]);
+ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[3]);
+ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[4]);
 
-ListaEstudiantes.listaEst[estudiante2].matricular(listaAsignaturas.listaAsign[asignatura1]);
-ListaEstudiantes.listaEst[estudiante2].matricular(listaAsignaturas.listaAsign[asignatura3]);
-ListaEstudiantes.listaEst[estudiante2].matricular(listaAsignaturas.listaAsign[asignatura4]);
-ListaEstudiantes.listaEst[estudiante2].matricular(listaAsignaturas.listaAsign[asignatura5]);
+ListaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[0]);
+ListaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[2]);
+ListaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[3]);
+ListaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[4]);
 
-ListaEstudiantes.listaEst[estudiante3].matricular(listaAsignaturas.listaAsign[asignatura1]);
-ListaEstudiantes.listaEst[estudiante3].matricular(listaAsignaturas.listaAsign[asignatura2]);
-ListaEstudiantes.listaEst[estudiante3].matricular(listaAsignaturas.listaAsign[asignatura3]);
+ListaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[0]);
+ListaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[1]);
+ListaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[2]);
 
-ListaEstudiantes.listaEst[estudiante4].matricular(listaAsignaturas.listaAsign[asignatura4]);
-ListaEstudiantes.listaEst[estudiante4].matricular(listaAsignaturas.listaAsign[asignatura5]);
+ListaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[3]);
+ListaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[4]);
 
 // Desmatriculación de algunos estudiantes en algunas aignaturas
-ListaEstudiantes.listaEst[estudiante1].desmatricular(listaAsignaturas.listaAsign[asignatura4]);
-ListaEstudiantes.listaEst[estudiante2].desmatricular(listaAsignaturas.listaAsign[asignatura3]);
-ListaEstudiantes.listaEst[estudiante3].desmatricular(listaAsignaturas.listaAsign[asignatura1]);
-ListaEstudiantes.listaEst[estudiante4].desmatricular(listaAsignaturas.listaAsign[asignatura5]);
+ListaEstudiantes.listaEst[0].desmatricular(listaAsignaturas.listaAsign[3]);
+ListaEstudiantes.listaEst[1].desmatricular(listaAsignaturas.listaAsign[2]);
+ListaEstudiantes.listaEst[2].desmatricular(listaAsignaturas.listaAsign[0]);
+ListaEstudiantes.listaEst[3].desmatricular(listaAsignaturas.listaAsign[4]);
 
 // Calificación de algunos estudiantes
-ListaEstudiantes.listaEst[estudiante1].calificar(listaAsignaturas.listaAsign[asignatura2], 10);
-ListaEstudiantes.listaEst[estudiante1].calificar(listaAsignaturas.listaAsign[asignatura3], 7.3);
+ListaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[1], 10);
+ListaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[2], 7.3);
 
-ListaEstudiantes.listaEst[estudiante2].calificar(listaAsignaturas.listaAsign[asignatura1], 9.5);
-ListaEstudiantes.listaEst[estudiante2].calificar(listaAsignaturas.listaAsign[asignatura4], 8);
-ListaEstudiantes.listaEst[estudiante2].calificar(listaAsignaturas.listaAsign[asignatura5], 6.66);
+ListaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[0], 9.5);
+ListaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[3], 8);
+ListaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[4], 6.66);
 
-ListaEstudiantes.listaEst[estudiante3].calificar(listaAsignaturas.listaAsign[asignatura3], 8.2);
+ListaEstudiantes.listaEst[2].calificar(listaAsignaturas.listaAsign[2], 8.2);
 
 // Bucle while
+
+while(true){
+    console.clear();
+    console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
+    console.log("1. Crear");
+    console.log("2. Eliminar");
+    console.log("3. Matricular");
+    console.log("4. Desmatricular");
+    console.log("5. Calificar");
+    console.log("6. Registros");
+    console.log("7. Buscar");
+    console.log("8. Promedio");
+    console.log("9. Reporte");
+
+    elegir = Number.parseInt(window.prompt("¿Cuál eliges?:"));
+
+    switch(elegir){
+        
+    }
+}
