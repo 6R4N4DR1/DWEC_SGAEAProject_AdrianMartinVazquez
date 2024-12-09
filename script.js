@@ -346,6 +346,11 @@ class ListaEstudiantes{
         }
     }
 
+    // Getter para la lista de Estudiantes
+    get listaEst(){
+        return [...this.#listaEst];
+    }
+
     // Metodo para agregar un estudiante sino esta ya en la lista
     agregarEstudiante(estudiante) {
         if (this.#listaEst.some(e => e.id === estudiante.id)) {
@@ -415,6 +420,11 @@ class ListaAsignaturas{
         for(const asignatura of asignaturas){
             this.agregarAsignatura(asignatura); // Se rellena la lista mediante el metodo agregarAsignatura
         }
+    }
+
+    // Getter para la lista de Asignaturas
+    get listaAsign(){
+        return [...this.#listaAsign];
     }
 
     // Agregar una asignatura a la lista si todavía no esta dentro
@@ -495,318 +505,38 @@ listaAsignaturas.agregarAsignatura(asignatura4);
 listaAsignaturas.agregarAsignatura(asignatura5);
 
 // Matriculación de estudiantes en algunas asignaturas
-estudiante1.matricular(asignatura1);
-estudiante2.matricular(asignatura2);
-estudiante3.matricular(asignatura3);
-estudiante4.matricular(asignatura4);
-estudiante5.matricular(asignatura5);
+ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura1]);
+ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura2]);
+ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura3]);
+ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura4]);
+ListaEstudiantes.listaEst[estudiante1].matricular(listaAsignaturas.listaAsign[asignatura5]);
+
+ListaEstudiantes.listaEst[estudiante2].matricular(listaAsignaturas.listaAsign[asignatura1]);
+ListaEstudiantes.listaEst[estudiante2].matricular(listaAsignaturas.listaAsign[asignatura3]);
+ListaEstudiantes.listaEst[estudiante2].matricular(listaAsignaturas.listaAsign[asignatura4]);
+ListaEstudiantes.listaEst[estudiante2].matricular(listaAsignaturas.listaAsign[asignatura5]);
+
+ListaEstudiantes.listaEst[estudiante3].matricular(listaAsignaturas.listaAsign[asignatura1]);
+ListaEstudiantes.listaEst[estudiante3].matricular(listaAsignaturas.listaAsign[asignatura2]);
+ListaEstudiantes.listaEst[estudiante3].matricular(listaAsignaturas.listaAsign[asignatura3]);
+
+ListaEstudiantes.listaEst[estudiante4].matricular(listaAsignaturas.listaAsign[asignatura4]);
+ListaEstudiantes.listaEst[estudiante4].matricular(listaAsignaturas.listaAsign[asignatura5]);
+
+// Desmatriculación de algunos estudiantes en algunas aignaturas
+ListaEstudiantes.listaEst[estudiante1].desmatricular(listaAsignaturas.listaAsign[asignatura4]);
+ListaEstudiantes.listaEst[estudiante2].desmatricular(listaAsignaturas.listaAsign[asignatura3]);
+ListaEstudiantes.listaEst[estudiante3].desmatricular(listaAsignaturas.listaAsign[asignatura1]);
+ListaEstudiantes.listaEst[estudiante4].desmatricular(listaAsignaturas.listaAsign[asignatura5]);
 
 // Calificación de algunos estudiantes
-estudiante1.calificar(asignatura1, 8);
-estudiante2.calificar(asignatura2, 7);
-estudiante3.calificar(asignatura3, 9);
-estudiante4.calificar(asignatura4, 6);
-while(true){
+ListaEstudiantes.listaEst[estudiante1].calificar(listaAsignaturas.listaAsign[asignatura2], 10);
+ListaEstudiantes.listaEst[estudiante1].calificar(listaAsignaturas.listaAsign[asignatura3], 7.3);
 
-    
+ListaEstudiantes.listaEst[estudiante2].calificar(listaAsignaturas.listaAsign[asignatura1], 9.5);
+ListaEstudiantes.listaEst[estudiante2].calificar(listaAsignaturas.listaAsign[asignatura4], 8);
+ListaEstudiantes.listaEst[estudiante2].calificar(listaAsignaturas.listaAsign[asignatura5], 6.66);
 
-    switch(""){
+ListaEstudiantes.listaEst[estudiante3].calificar(listaAsignaturas.listaAsign[asignatura3], 8.2);
 
-        /**
-         * 3.1. Crear
-         * 
-         * Siempre se pueden crear direcciones, estudiantes y/o asignaturas.
-         */
-
-        case 1:
-
-            do{
-
-
-
-                switch(""){
-
-                    /**
-                     * 3.1.1. Crear Dirección
-                     * 
-                     * Se pedirá calle, número, piso, código postal, provincia y localidad.
-                     * Al crearla, se guardará en el Array listaDirecciones.
-                     */
-
-                    case 1:
-
-                    
-
-                        break;
-
-                    /**
-                     * 3.1.2. Crear Estudiante
-                     * 
-                     * Si el Array listaDirecciones no está vacío, se pedirá si se quiere usar una dirección.
-                     * Si no, se pedirá calle, número, piso, código postal, provincia y localidad y se
-                     * preguntará si se quiere guardar la dirección en el Array listaDirecciones.
-                     * 
-                     * Se pedirá nombre y edad, y se creará el estudiante.
-                     */
-
-                    case 2:
-
-                        
-
-                        break;
-
-                    /**
-                     * 3.1.3. Crear Asignatura
-                     * 
-                     * Se pedirá nombre, y se creará la asignatura sólo si el listaAsignaturas no contiene
-                     * una asignatura con el mismo nombre.
-                     */
-
-                    case 3:
-
-                        
-
-                        break;
-
-                }
-
-            }while(true);
-
-            break;
-
-        /**
-         * 3.2. Eliminar
-         * 
-         * No se podrá acceder a Eliminar si no existe ningún dato, ya sea dirección, estudiante o asignatura.
-         */
-
-        case 2:
-
-            do{
-
-                
-
-                switch(""){
-
-                    /**
-                     * 3.2.1. Eliminar Dirección
-                     * 
-                     * Si hay direcciones en el Array listaDirecciones, se escoge una de ellas para su
-                     * eliminación.
-                     */
-
-                    case 1:
-
-                        
-
-                        break;
-
-                    /**
-                     * 3.2.2. Eliminar Estudiante
-                     * 
-                     * Si existen estudiantes en listaEstudiantes, se escoge un estudiante para su
-                     * eliminación.
-                     */
-
-                    case 2:
-
-                        
-
-                        break;
-
-                    /**
-                     * 3.2.3. Eliminar Asignatura
-                     * 
-                     * Si hay asignaturas en listaAsignaturas, se escoge una asignatura para su eliminación.
-                     */
-
-                    case 3:
-
-                        
-
-                        break;
-
-                }
-
-            }while(true);
-
-            break;
-
-        /**
-         * 3.3. Matricular
-         * 
-         * Si no hay datos registrados, o no hay estudiantes, o no hay asignaturas, no se puede acceder.
-         * 
-         * En primer lugar se escoge un estudiante de listaEstudiantes. Sólo se podrán escoger aquellos que
-         * no estén matriculados de todas las asignaturas.
-         * Después, se escogen las asignaturas a matricular.
-         */
-
-        case 3:
-
-            
-
-            break;
-
-        /**
-         * 3.4. Desmatricular
-         * 
-         * Si no existen datos, asignaturas, o estudiantes matriculados de al menos una asignatura, no se
-         * puede acceder.
-         * 
-         * En primer lugar, se escoge un estudiante de entre los matriculados en al menos una asignatura.
-         * Después, se seleccionan las asignaturas a desmatricular.
-         */
-
-        case 4:
-
-            
-
-            break;
-
-        /**
-         * 3.5. Registro de Auditoría
-         * 
-         * Si no existen datos, estudiantes o asignaturas, no se puede acceder.
-         * 
-         * Se escoge el estudiante para obtener sus registros y se muestran.
-         */
-
-        case 5:
-
-            
-
-            break;
-
-        /**
-         * 3.6. Calificar
-         * 
-         * Si no existen datos, asignaturas, o estudiantes matriculados de al menos una asignatura, no se 
-         * puede acceder.
-         * 
-         * En primer lugar, se escoge entre los estudiantes matriculados de al menos una asignatura.
-         * Después, se escoge la asignatura a calificar entre las asignaturas de las cuales el estudiante
-         * está matriculado. Si dicha asignatura ya está calificada, se emitirá una advertencia sobre la
-         * sobreescritura de la nota.
-         * Finalmente, se pide una nota entre 0 y 10 y se califica al estudiante con dichos parámetros.
-         */
-
-        case 6:
-
-            
-            
-            break;
-
-        /**
-         * 3.7. Buscar
-         * 
-         * Si no existen datos, estudiantes o asignaturas, no se puede acceder.
-         */
-
-        case 7:
-
-            
-
-            do{
-
-                
-
-                switch(""){
-
-                    /**
-                     * 3.7.1. Buscar Estudiantes
-                     * 
-                     * Al principio, se muestran todos los estudiantes de listaEstudiantes.
-                     * Se introduce un texto y se muestran las coincidencias de los estudiantes cuyo nombre
-                     * incluya dicho texto.
-                     */
-
-                    case 1:
-
-                        
-
-                        break;
-
-                    /**
-                     * 3.7.2. Buscar Asignaturas
-                     * 
-                     * Al principio, se muestran todos las asignaturas de listaAsignaturas.
-                     * Se introduce un texto y se muestran las coincidencias de las asignaturas cuyo nombre
-                     * incluya dicho texto.
-                     */
-
-                    case 2:
-
-                        
-
-                        break;
-
-                }
-
-            }while(true);
-
-            break;
-
-        /**
-         * 3.8. Calcular Promedio
-         * 
-         * Si no existen datos, estudiantes o asignaturas, no se puede acceder.
-         */
-
-        case 8:
-
-            
-
-            do{
-
-                
-
-                switch(""){
-
-                    /**
-                     * 3.8.1. Promedio General
-                     * 
-                     * Muestra el promedio de los promedios de los estudiantes (promedio general) y una de los promedios
-                     * de cada estudiante.
-                     */
-
-                    case 1:
-
-                        
-
-                        break;
-
-                    /**
-                     * 3.8.2. Promedio por Asignaturas
-                     * 
-                     * Muestra el promedio en una asignatura de las notas de todos los estudiantes matriculados en ella.
-                     */
-
-                    case 2:
-
-                        
-
-                        break;
-
-                }
-
-            }while(true);
-
-            break;
-
-        /**
-         * 3.9. Mostrar Reporte
-         * 
-         * Muestra el reporte de todos los estudiantes y su información, tanto datos personales (nombre, edad y dirección)
-         * como calificaciones (asignaturas y promedio).
-         */
-
-        case 9:
-
-            
-
-            break;
-        
-    }
-
-}
+// Bucle while
