@@ -396,7 +396,7 @@ class ListaEstudiantes{
                     if(typeof nota === "string"){
                         const notas = nota;
                     }else{
-                        const notas = nota.toFixed(2);
+                        const notas = Number(nota).toFixed(2);
                     }
 
                     console.log(`\t${asignatura.nombre} - Nota: ${notas}`);
