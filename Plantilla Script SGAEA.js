@@ -179,7 +179,7 @@ class Estudiante extends Persona{
     #direccion;
     #asignaturas;
     #registros;
-    static idsUsados = new Set();
+    static #idsUsados = [];
 
     constructor(nombre, edad, direccion) {
         super(nombre, edad);
@@ -193,8 +193,8 @@ class Estudiante extends Persona{
         let id;
         do {
         id = `E-${Math.floor(Math.random() * 10000)}`;
-        } while (Estudiante.idsUsados.includes(id));
-        Estudiante.idsUsados.push(id);
+        } while (Estudiante.#idsUsados.includes(id));
+        Estudiante.#idsUsados.push(id);
         return id;
     }
 
@@ -224,7 +224,6 @@ class Estudiante extends Persona{
             const dia = fecha.getDate();
             const mes = mesesESP[fecha.getMonth()];
             const ano = fecha.getFullYear();
-            
             const fechaESP = `${diaSemana}, ${dia} de ${mes} de ${ano}`;
 
             log.push(`${accion} en ${asignatura} el ${fechaESP}`);
@@ -274,6 +273,10 @@ class Estudiante extends Persona{
         return Math.round(notas.reduce((sumacc, asign) => sumacc += asign[1], 0) / notas.length);
     }
 
+    static eliminarIdUsado(id){
+        Estudiante.#idsUsados = Estudiante.#idsUsados.filter(iU => iU !== id);
+    }
+
     toString() {
         return `${this.#id} -> ${super.toString()}`;
     }
@@ -308,19 +311,33 @@ class Estudiante extends Persona{
  */
 
 class Asignatura{
+    #nombre;
+    #calificaciones;
+
     constructor(nombre) {
-        this.nombre = /^[a-zA-Z\sIV]+$/.test(nombre) ? nombre : "Asignatura";
-        this.calificaciones = [];
+        if(/^[a-zA-ZáéíóúüÁÉÍÓÚÜ\sIV]+$/.test(nombre)){
+            this.#nombre = nombre;
+        }else{
+            this.#nombre = "Asignatura no especificada";
+        }
+
+        this.#calificaciones = [];
+    }
+
+    get nombre(){
+        return this.#nombre;
     }
 
     get promedio() {
-    return this.calificaciones.length
-        ? (this.calificaciones.reduce((a, b) => a + b) / this.calificaciones.length).toFixed(2)
-        : "Sin evaluar";
+        if(this.#calificaciones.length === 0){
+            return "Asignatura no evaluada";
+        }else{
+            return Math.round(this.calificaciones.reduce((sumacc, nota) => sumacc + parseFloat(nota).toFixed(2), 0) / this.#calificaciones.length);
+        }
     }
 
     toString() {
-        return this.nombre;
+        return this.#nombre;
     }
 }
 
@@ -350,13 +367,68 @@ class Asignatura{
  * + eliminarEstudiante(id): Elimina del Array listaEst el estudiante cuya id sea la misma que id y elimina el
  *      número ocupado de dicha id mediante el método estático eliminaridsUsados().
  * 
- * + busquedaEstudiantes(est): Array de los objetos Estudiante cuyos nombres incluyen el String est.
+ * + busquedaEstudiantes(nombre): Array de los objetos Estudiante cuyos nombres incluyen el String nombre.
  */
 
 class ListaEstudiantes{
+    #listaEst;
 
-    
+    constructor(...estudiantes) {
+        this.#listaEst = [];
+        for(const estudiante of estudiantes){
+            this.agregarEstudiante(estudiante);
+        }
+    }
 
+    agregarEstudiante(estudiante) {
+        if (this.#listaEst.filter(e => e.id === estudiante.id).length !== 0) {
+            throw new Error("El estudiante ya está en la lista.");
+        } else {
+            this.#listaEst.push(estudiante);
+            this.#listaEst.sort((est1, est2) => parseInt(est1.id.slice(1)) - parseInt(est2.id.slice(1)));
+        }
+    }
+
+    eliminarEstudiante(id) {
+        if (this.#listaEst.filter(e => e.id !== id).length === this.listaEst.length) {
+            throw new Error("No se encuentra ningún estudiante con este id en la lista");
+        }else{
+            this.#listaEst = this.#listaEst.filter(e => e.id !== id);
+            Estudiante.eliminarIdUsado(id.slice(1));
+        } 
+    }
+
+    buscarEstudiantes(nombre) {
+        return this.estudiantes.filter(e => e.nombre.toLowerCase().includes(nombre.toLowerCase()));
+    }
+
+    get promedioGeneral() {
+        const promedios = this.#listaEst.filter(e => !isNaN(e.promedio));
+        if(promedios.length === 0){
+            return "No están calificados";
+        }else{
+            return Math.round(promedios.reduce((sumacc, estudiante) => sumacc += parseFloat(estudiante.promedio).toFixed(2), 0) / promedios.length);
+        }
+    }
+
+    listaReportes(){
+        for(const liEst of this.#listaEst){
+            console.log(`Información del alumno con id: ${liEst.id}`);
+                console.log(`\tNombre: ${liEst.nombre}`);
+                console.log(`\tEdad: ${liEst.edad}`);
+                console.log(`\tDirección: ${liEst.direccion.toString()}`);
+            console.log(`Notas del alumno con id: ${liEst.id}`);
+                for(const asignatura of liEst.asignaturas){
+                    if(typeof asignatura[1] === 'string'){
+                        const notaPorAsignatura = asignatura[1];
+                    }else{
+                        const notaPorAsignatura = asignatura[1].toFixed(2);
+                    }
+
+                    console.log(`\t${asignatura[0].nombre} - Nota(s): ${notaPorAsignatura}`);
+                }
+        }
+    }
 }
 
 /**
@@ -376,13 +448,39 @@ class ListaEstudiantes{
  * + eliminarAsignatura(nombre): Si existe una asignatura cuyo nombre coincide con alguno de los nombres de las
  *      asignaturas del Array listaAsign, elimina de dicho Array dicha asignatura. De lo contrario, devuelve un Error.
  * 
- * + busquedaAsignaturas(asign): Array de los objetos Asignatura cuyos nombres incluyen el String asign.
+ * + busquedaAsignaturas(nombre): Array de los objetos Asignatura cuyos nombres incluyen el String nombre.
  */
 
 class ListaAsignaturas{
+    #listaAsign;
 
+    constructor(...asignaturas){
+        this.#listaAsign = [];
+
+        for(const asignatura of asignaturas){
+            this.agregarAsignatura(asignatura);
+        }
+    }
+
+    agregarAsignatura(asignatura) {
+        if (this.#listaAsign.filter(a => a.nombre === asignatura.nombre).length !== 0) {
+            throw new Error("La asignatura ya está en la lista");
+        } else {
+            this.#listaAsign.push(asignatura);
+        }
+    }
     
+    eliminarAsignatura(nombre) {
+        if(this.#listaAsign.filter(a => a.nombre === nombre).length === 0){
+            throw new Error("Dicha asignatura no se encuentra en la lista");
+        }else{
+            this.#listaAsign = this.#listaAsign.filter(a => a.nombre !== nombre);
+        }
+    }
 
+    buscarAsignaturas(nombre) {
+        return this.#listaAsign.filter(a => a.nombre.toLowerCase().includes(nombre.toLowerCase()));
+    }
 }
 
 /**
@@ -400,6 +498,13 @@ class ListaAsignaturas{
  * La variable eleccion será la variable que siempre obtenga el valor de window.prompt().
  */
 
+const listaDirecciones = [
+    new Direccion("Calle Falsa", 123, 1, "28001", "Madrid", "Madrid"),
+    new Direccion("Avenida Siempreviva", 742, 2, "28002", "Madrid", "Madrid"),
+    new Direccion("Gran Vía", 15, 3, "28003", "Madrid", "Madrid"),
+    new Direccion("Paseo del Prado", 34, 4, "28004", "Madrid", "Madrid"),
+    new Direccion("Calle Serrano", 85, 5, "28005", "Madrid", "Madrid"),
+];
 while(true){
 
     
