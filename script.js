@@ -401,6 +401,7 @@ class ListaEstudiantes{
 
                     console.log(`\t${asignatura.nombre} - Nota: ${notas}`);
                 }
+                console.log(`\tPromedio: ${est.promedio}\n`);
         }
     }
 }
