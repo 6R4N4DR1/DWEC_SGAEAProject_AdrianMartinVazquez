@@ -1,46 +1,29 @@
 /**
   SGAEA - Sistema de Gestión Académica de Estudiantes y Asignaturas
   Adrián Martín Vázquez 2º DAW AULA
-  Github Pages: https://github.com/6R4N4DR1/DWEC_SGAEAProject_AdrianMartinVazquez/
-  (Es necesario abrir la consola de las DevTools antes de cargar la página)
- */
-
-/**
- * Definición de Clases
- * 
- * En esta parte se definen las clases Persona, Direccion, Estudiante, Asignatura, ListaEstudiantes y ListaAsignaturas.
+  Github: https://github.com/6R4N4DR1/DWEC_SGAEAProject_AdrianMartinVazquez/
  */
 
 // Clase base para la persona, con datos de nombre y edad
 class Persona{
-    // Declaración de atributos
+    // Declaración de atributos encapsulados
     #nombre; 
     #edad; 
 
     constructor(nombre, edad) {
         // Validación del nombre, si es válido se asigna, de lo contrario, se asigna un valor por defecto
-        if(this.#validarNombre(nombre)){
+        if(typeof nombre === "string" && /^[a-zA-ZáéíóúüÁÉÍÓÚÜ\s]+$/.test(nombre)){
             this.#nombre = nombre;
         }else{
             this.#nombre = "John Doe";
         }
 
         // Validación de la edad, si es válida se asigna, de lo contrario, se asigna 0
-        if(this.#validarEdad(edad)){
+        if(Number.isInteger(edad) && edad > 0 && edad < 100){
             this.#edad = edad
         }else{
             this.#edad = 0;
         }
-    }
-
-    // Método privado para validar el nombre (solo letras, tíldes y espacios)
-    #validarNombre(nombre) {
-        return typeof nombre === "string" && /^[a-zA-ZáéíóúüÁÉÍÓÚÜ\s]+$/.test(nombre);
-    }
-
-    // Método privado para validar la edad (número entero entre 1 y 99)
-    #validarEdad(edad) {
-        return Number.isInteger(edad) && edad > 0 && edad < 100;
     }
 
     // Getter para obtener el nombre
@@ -60,7 +43,7 @@ class Persona{
 
 // Clase para representar una dirección de un estudiante o persona
 class Direccion{
-    // Declaración de atributos
+    // Declaración de atributos encapsulados
     #calle;
     #numero;
     #piso;
@@ -69,53 +52,48 @@ class Direccion{
     #localidad;
 
     constructor(calle, numero, piso, codigoPostal, provincia, localidad) {
-        // Validación de los atributos y asignación de valores por defecto si no son válidos
-        if(this.#validarCadena(calle)){
+        // Validación de los atributos privados y asignación de valores a estos si son válidos, de lo contrario devolverán un valor por defecto
+
+        if(this.#validarCadenas(calle)){
             this.#calle = calle
         }else{
             this.#calle = "Sin Nombre";
         }
 
-        if(this.#validarNumero(numero)){
+        if(Number.isInteger(numero) && numero > 0){
             this.#numero = numero;
         }else{
             this.#numero = 0;
         }
         
-        this.#piso = piso;
+        if(this.#validarCadenas(piso)){
+            this.#piso = piso;
+        }else{
+            this.#piso = "Ninguno";
+        }
 
-        if(this.#validarCodigoPostal(codigoPostal)){
+        if(typeof codigoPostal === "string" && /^[0-9]{5}$/.test(codigoPostal)){
             this.#codigoPostal = codigoPostal;
         }else{
             this.#codigoPostal = "00000";
         }
 
-        if(this.#validarCadena(provincia)){
+        if(this.#validarCadenas(provincia)){
             this.#provincia = provincia
         }else{
             this.#provincia = "Desconocida";
         }
 
-        if(this.#validarCadena(localidad)){
+        if(this.#validarCadenas(localidad)){
             this.#localidad = localidad
         }else{
             this.#localidad = "Desconocida";
         }
     }
 
-    // Método privado para validar el código postal (debe ser un número de 5 dígitos)
-    #validarCodigoPostal(codigoPostal){
-        return typeof codigoPostal === "string" && /^[0-9]{5}$/.test(codigoPostal);
-    }
-
-    // Método privado para validar strings
-    #validarCadena(texto){
+    // Método privado o encapsulado para validar strings
+    #validarCadenas(texto){
         return typeof texto === "string";
-    }
-
-    // Método privado para validar números enteros
-    #validarNumero(numb){
-        return Number.isInteger(numb) && numb > 0;
     }
 
     // Getters para los atributos privados
@@ -160,7 +138,19 @@ class Estudiante extends Persona{
 
     constructor(nombre, edad, direccion) {
         super(nombre, edad); // Llamada al constructor de Persona
-        this.#id = this.#generarId(); // Generación de un ID único para el estudiante
+        
+        // Inicializamos el numero de Ids aleatorios a nada
+        numeroId = ``;
+
+        // Hacemos un bucle poniendo un id que empieza por E- seguido de 4 numeros mientras que dicho id este en idsUsados
+        do {
+            numeroId = `E-${Math.floor(Math.random() * 10000)}`;
+        } while (Estudiante.idsUsados.includes(id));
+
+        // Si el id no esta en idsUsados se sale del bucle y se añade dicho id a la lista de idsUsados
+        Estudiante.idsUsados.push(numeroId)
+        this.#id = numeroId; // El id se instancia con el numeroId obtenido
+        
         // Validacion de que el atributo direccion que se pasa como parametro sea un objeto de la clase Direccion 
         if (!direccion || typeof direccion !== "object") {
             throw new Error("Dirección no válida");
@@ -169,16 +159,6 @@ class Estudiante extends Persona{
         }
         this.#asignaturas = []; // Inicialización del array de asignaturas
         this.#registros = []; // Inicialización del array de registros
-    }
-
-    // Método privado para generar un ID único para el estudiante
-    #generarId() {
-        let id;
-        do {
-        id = `E-${Math.floor(Math.random() * 10000)}`;
-        } while (Estudiante.idsUsados.includes(id));
-        Estudiante.idsUsados.push(id);
-        return id;
     }
     
     // Getters para obtener el id, la direccion y la asignaturas del estudiante
@@ -197,20 +177,31 @@ class Estudiante extends Persona{
     // Getter para obtener los registros de matriculación y desmatriculación con la fecha de cambio en español
     get registros(){
         return this.#registros.map(([accion, asignatura, fecha]) => {
+            // Inicialización de arrays de dias y meses en formato largo y en español
             const diasESP = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
             const mesesESP = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
+            // Se obtiene el dia numérico del equipo y se pasa a español mediante el array diasESP que coge como indice el dia de hoy
             const diaSemana = diasESP[fecha.getDay()];
+
+            // Se obtiene el dia del mes
             const dia = fecha.getDate();
+
+            // Se obtiene el mes númerico del equipo y se pasa a español mediante el array mesesESP que coge como indice el mes en el que se está
             const mes = mesesESP[fecha.getMonth()];
+
+            // Se obtiene el año en formato entero, no reducido
             const ano = fecha.getFullYear();
 
+            // El map devuelve la accion que se realiza con estos elementos matrices del array registros
             return `${accion} en ${asignatura} el ${diaSemana}, ${dia} de ${mes} de ${ano}`;
         });
     }
 
     // Método para matricular a un estudiante en una asignatura
     matricular(asignatura) {
+        // Si el elemento nombre del array asignaturas que se encuentra en el primer valor de la matriz (0) no tiene dentro el nombre de la asignatura que se pasa como parametro
+        // Se mete una nueva asignatura al array de asignaturas y como segundo valor de la matriz sin calificar y se mete tambien el registro de la matriculación
         if (!this.#asignaturas.map(a => a[0].nombre).includes(asignatura.nombre)) {
             this.#asignaturas.push([ asignatura, "Sin calificar" ]);
             this.#registros.push(["Matriculación", asignatura.nombre, new Date()]);
@@ -219,6 +210,8 @@ class Estudiante extends Persona{
 
     // Método para desmatricular a un estudiante de una asignatura
     desmatricular(asignatura) {
+        // Si el elemento nombre del array asignaturas que se encuentra en el primer valor de la matriz (0) no tiene el nombre de la asignatura que se pasa como parametro
+        // Manda un error, de lo contrario, se rehace el array asignaturas eliminando la asignatura pasada como parametro, y se hace un nuevo registro
         if(!this.#asignaturas.map(a => a[0].nombre).includes(asignatura.nombre)){
             throw new Error("No hay estudiante matriculado en esta asignatura");
         }else{
@@ -229,14 +222,20 @@ class Estudiante extends Persona{
 
     // Método para calificar a un estudiante en una asignatura
     calificar(asignatura, nota) {
+        // Si el elemento nombre del array asignaturas que se encuentra en el primer valor de la matriz (0) no tiene dentro el nombre de la asignatura que se pasa como parametro
+        // Devuelve un error
         if(!this.#asignaturas.map(a => a[0].nombre).includes(asignatura.nombre)){
             throw new Error("No hay estudiante matriculado en esta asignatura");
         }
 
+        // Si el elemento nota no es un numero y el numero es menor de 0 o mayor de 10 entonces devuelve un error
         if (typeof nota !== "number" || nota < 0 || nota > 10){
             throw new Error("La nota tiene que ser entre 0 y 10");
         }
 
+        // Se itera el array de asignaturas añadiendo por asignatura que se pasa como parametro su calificacion que es el segundo valor de la matriz (1)
+        // Además se agregar esa nueva calificación a la asignatura mediante el metodo de Asignatura de agregarCalificacion, una vez se encuentre el nombre
+        // de la asignatura que se paso como parametro y se hagan estas asignaciones, se sale del bucle
         for(const asign of this.#asignaturas){
             if(asign[0].nombre === asignatura.nombre){
                 asign[1] = parseFloat(nota.toFixed(2));
@@ -248,22 +247,27 @@ class Estudiante extends Persona{
 
     // Getter para calcular el promedio de notas de un estudiante
     get promedio() {
+        // Se hace un array de notas que obtiene las notas del array asignaturas
         const notas = this.#asignaturas.filter(a => typeof a[1] === "number");
 
+        // Si la longitud es 0 del array notas salta un error
         if(notas.length == 0){
             return "No hay calificaciones";
         }
 
+        // Se hace la suma de las notas y se devuelve el calculo de esa suma con la division de la longitud de notas del array notas
         const suma = notas.reduce((sumacc, asign) => sumacc += asign[1], 0);
         return Math.round(suma / notas.length);
     }
 
     // Metodo estatico para la llamada del atributo estatico de idsUsados para eliminar un id Ocupado y así desocuparlo
     static eliminarIdUsado(id){
+        // Si el array estatico de idsUsados no contiene el id que se pasa como parametro, devuelve un error
         if(!Estudiante.idsUsados.includes(id)){
             throw new Error("ID de usuario no encontrado")
         }
 
+        // Se rehace el array de idsUsados sin el id que se pasó como parametro que estaba anteriormente en el array estatico idsUsados
         Estudiante.idsUsados = Estudiante.idsUsados.filter(iU => iU !== id);
     }
 
@@ -279,7 +283,7 @@ class Asignatura{
     #calificaciones; // notas o calificaciones de una asignatura
 
     constructor(nombre) {
-        // Validación del nombre que solo puede contener letras, tildes y espacios, de lo contratio, devolverá "Asignatura no especificada"
+        // Validación del nombre que solo puede contener letras, tildes y espacios y numeros romanos, de lo contratio, devolverá "Asignatura no especificada"
         if(/^[a-zA-ZáéíóúüÁÉÍÓÚÜ\sIVXLCDM]+$/.test(nombre)){
             this.#nombre = nombre;
         }else{
@@ -387,21 +391,20 @@ class ListaEstudiantes{
     // Metodo para mostrar los reportes de de cada estudiante su información y sus calificaciones
     listaReportes(){
         for(const est of this.#listaEst){
-            console.log(`Información del alumno con id: ${est.id}`);
-                console.log(`\tNombre: ${est.nombre}`);
-                console.log(`\tEdad: ${est.edad}`);
-                console.log(`\tDirección: ${est.direccion.toString()}`);
-            console.log(`Notas del alumno con id: ${est.id}`);
-                for(const [asignatura, nota] of est.asignaturas){
-                    if(typeof nota === "string"){
-                        const notas = nota;
+            console.log(`REPORTE de Alumno: ${est.toString()}`)
+            console.log(`\tDirección: ${est.direccion.toString()}`);
+            console.log(`\tLista de notas:`);
+                for(const asignatura of est.asignaturas){
+                    if(typeof asignatura[1] == "string"){
+                        const notas = asignatura[1];
                     }else{
-                        const notas = Number(nota).toFixed(2);
+                        const notas = (asignatura[1]).toFixed(2);
                     }
 
-                    console.log(`\t${asignatura.nombre} - Nota: ${notas}`);
+                    console.log(`\t\t${asignatura[0].nombre} - Nota: ${notas}`);
                 }
-                console.log(`\tPromedio: ${est.promedio}\n`);
+                console.log(`\tPromedio (GPA): ${est.promedio}`);
+                console.log(`\n`);
         }
     }
 }
@@ -441,40 +444,23 @@ class ListaAsignaturas{
             this.#listaAsign.splice(indiceAsign, 1);
         }
     }
-
-    // Metodo para buscar una asignatura en la lista por nombre
-    buscarAsignaturas(nombre) {
-        return this.#listaAsign.filter(a => a.nombre.toLowerCase().includes(nombre.toLowerCase()));
-    }
 }
 
-/**
- * Programa Principal.
- * 
- * En esta sección se declara un objeto ListaEstudiantes, otro objeto ListaAsignaturas, y un Array de objetos
- * Direccion llamado listaDirecciones. Seguidamente, se entra en el bucle while.
- * 
- * Extra: Se inicializan y añaden 5 direcciones, 5 estudiantes y 5 asignaturas.
- *        Se matriculan a algunos estudiantes de algunas asignaturas.
- *        Se desmatriculan a algunos estudiantes de algunas asignaturas.
- *        Se califican a algunos estudiantes en algunas asignaturas.
- * 
- * Por siempre, se preguntará la elección principal de la acción a realizar.
- * La variable eleccion será la variable que siempre obtenga el valor de window.prompt().
- */
+
+// Main con la prueba de uso del codigo
 
 const listaDirecciones = [];
 const listaEstudiantes = new ListaEstudiantes();
 const listaAsignaturas = new ListaAsignaturas();
 
-// Inicialización de direcciones (5 direcciones de ejemplo)
+// Inicialización de direcciones (5 direcciones de prueba)
 listaDirecciones.push(new Direccion("Calle Paraguay", 1, "Bajo", "18210", "Peligros", "Granada"));
 listaDirecciones.push(new Direccion("Calle Alcalá la Real", 12, "3ºB", "18013", "Norte", "Granada"));
 listaDirecciones.push(new Direccion("Calle Francisco Ayala", 20, "2", "18014", "Granada", "Granada"));
 listaDirecciones.push(new Direccion("Calle Afán de Ribera", 15, "2ºA", "18005", "Granada", "Granada"));
 listaDirecciones.push(new Direccion("Calle Aliatar", 17, "Bajo", "18110", "Híjar", "Granada"));
 
-// Inicialización de estudiantes (5 estudiantes de ejemplo)
+// Inicialización de estudiantes (5 estudiantes de prueba)
 const estudiante1 = new Estudiante("Adrián Martín", 19, listaDirecciones[0]);
 const estudiante2 = new Estudiante("Sara Garzón", 19, listaDirecciones[1]);
 const estudiante3 = new Estudiante("Lorenzo Rodriguez", 21, listaDirecciones[2]);
@@ -487,7 +473,7 @@ listaEstudiantes.agregarEstudiante(estudiante3);
 listaEstudiantes.agregarEstudiante(estudiante4);
 listaEstudiantes.agregarEstudiante(estudiante5);
 
-// Inicialización de asignaturas (5 asignaturas de ejemplo)
+// Inicialización de asignaturas (5 asignaturas de prueba)
 const asignatura1 = new Asignatura("DWEC");
 const asignatura2 = new Asignatura("DWES");
 const asignatura3 = new Asignatura("Despliegue de Aplicaciones Web");
@@ -540,19 +526,87 @@ ListaEstudiantes.listaEst[2].calificar(listaAsignaturas.listaAsign[2], 8.2);
 while(true){
     console.clear();
     console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
-    console.log("1. Crear");
-    console.log("2. Eliminar");
-    console.log("3. Matricular");
-    console.log("4. Desmatricular");
-    console.log("5. Calificar");
-    console.log("6. Registros");
-    console.log("7. Buscar");
-    console.log("8. Promedio");
-    console.log("9. Reporte");
+    console.log("1. Crear un estudiante y su dirección");
+    console.log("2. Crear una asignatura");
+    console.log("3. Eliminar estudiante");
+    console.log("4. Eliminar asignatura");
+    console.log("5. Buscar un estudiante");
+    console.log("6. Matricular un estudiante");
+    console.log("7. Desmatricular un estudiante");
+    console.log("8. Calificar a un estudiante en una asignatura");
+    console.log("9. Registros de matriculaciones y desmatriculaciones");
+    console.log("10. Promedios");
+    console.log("11. Reporte listado de estudiantes");
+    console.log("0. Salir del sistema");
 
-    elegir = Number.parseInt(window.prompt("¿Cuál eliges?: "));
+    let opcion = Number.parseInt(window.prompt("Selecciona una de estas opciones: "));
 
-    switch(elegir){
+    switch(opcion){
+        case '1': {
+            console.clear();
+            console.log("Creando dirección del estudiante nuevo...");
+            const calle = window.prompt("Introduce la calle: ");
+            console.log(`Calle: ${calle}`);
+            const numero = window.prompt("Introduce el número: ");
+            console.log(`Número: ${numero}`);
+            const piso = window.prompt("Introduce el piso: ");
+            console.log(`Piso: ${piso}`);
+            const codigoPostal = window.prompt("Introduce el código postal: ");
+            console.log(`Código postal: ${codigoPostal}`);
+            const provincia = window.prompt("Introduce la provincia: ");
+            console.log(`Provincia: ${provincia}`);
+            const localidad = window.prompt("Introduce la localidad: ");
+            console.log(`Localidad: ${localidad}`);
+
+            listaDirecciones.push(new Direccion(calle, numero, piso, codigoPostal, provincia, localidad));
+            console.log("\nDirección del nuevo estudiante creada");
+
+            console.log("\n\nCreando nuevo estudiante...");
+
+            let direccion;
+            direccion = listaDirecciones[listaDirecciones.length - 1];
+
+            const nombreEst = window.prompt("Introduce el nombre del estudiante: ");
+            console.log(`Nombre: ${nombreEst}`);
+            const edad = window.prompt("Introduce la edad del estudiante: ");
+            console.log(`Edad: ${edad}`);
+
+            try{
+                listaEstudiantes.agregarEstudiante(new Estudiante(nombreEst, edad, direccion));
+                console.log("Creación del estudiante completado sin errores");
+                console.log(`Nombre: ${nombreEst}`);
+                console.log(`Edad: ${edad}`);
+                console.log(`Dirección: ${direccion.toString()}`);
+            }catch(err){
+                console.log("Error durante la creación del estudiante");
+                console.log(`Nombre: ${nombreEst}`);
+                console.log(`Edad: ${edad}`);
+                console.log(`Dirección: ${direccion.toString()}`);
+            }
+            break;
+        }
+        
+        case '2': {
+            console.clear();
+            console.log("Creando nueva asignatura...");
+            const nombreAsign = window.prompt("Introduce el nombre de la asignatura: ");
+            console.log(`Nombre asignatura: ${nombreAsign}`);
+
+            try{
+                listaAsignaturas.agregarAsignatura(new Asignatura(nombreAsign));
+                console.log("Creación de la asignatura completado sin errores");
+                console.log(`Nombre asignatura: ${nombreAsign}`);
+            }catch(err){
+                console.log("Error durante la creación de la asignatura");
+                console.log(`Nombre asignatura: ${nombreAsign}`);
+            }
+            break;
+        }
+
+        case '3': {
+            
+        }
+
 
     }
 }
