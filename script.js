@@ -1,7 +1,7 @@
 /**
   SGAEA - Sistema de Gestión Académica de Estudiantes y Asignaturas
   Adrián Martín Vázquez 2º DAW AULA
-  Github Pages: https://github.com/6R4N4DR1/DWEC_SGAEAProject_AdrianMartinVazquez/index.html
+  Github Pages: https://github.com/6R4N4DR1/DWEC_SGAEAProject_AdrianMartinVazquez/
   (Es necesario abrir la consola de las DevTools antes de cargar la página)
  */
 
