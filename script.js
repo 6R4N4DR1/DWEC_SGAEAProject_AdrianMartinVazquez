@@ -140,12 +140,12 @@ class Estudiante extends Persona{
         super(nombre, edad); // Llamada al constructor de Persona
         
         // Inicializamos el numero de Ids aleatorios a nada
-        numeroId = ``;
+        let numeroId = ``;
 
         // Hacemos un bucle poniendo un id que empieza por E- seguido de 4 numeros mientras que dicho id este en idsUsados
         do {
             numeroId = `E-${Math.floor(Math.random() * 10000)}`;
-        } while (Estudiante.idsUsados.includes(id));
+        } while (Estudiante.idsUsados.includes(numeroId));
 
         // Si el id no esta en idsUsados se sale del bucle y se añade dicho id a la lista de idsUsados
         Estudiante.idsUsados.push(numeroId)
@@ -447,6 +447,7 @@ class ListaAsignaturas{
 const listaDirecciones = [];
 const listaEstudiantes = new ListaEstudiantes();
 const listaAsignaturas = new ListaAsignaturas();
+let opcion;
 
 // Inicialización de direcciones (5 direcciones de prueba)
 listaDirecciones.push(new Direccion("Calle Paraguay", 1, "Bajo", "18210", "Peligros", "Granada"));
@@ -482,43 +483,44 @@ listaAsignaturas.agregarAsignatura(asignatura4);
 listaAsignaturas.agregarAsignatura(asignatura5);
 
 // Matriculación de estudiantes en algunas asignaturas
-ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[0]);
-ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[1]);
-ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[2]);
-ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[3]);
-ListaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[4]);
+listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[0]);
+listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[1]);
+listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[2]);
+listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[3]);
+listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[4]);
 
-ListaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[0]);
-ListaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[2]);
-ListaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[3]);
-ListaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[4]);
+listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[0]);
+listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[2]);
+listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[3]);
+listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[4]);
 
-ListaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[0]);
-ListaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[1]);
-ListaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[2]);
+listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[0]);
+listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[1]);
+listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[2]);
 
-ListaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[3]);
-ListaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[4]);
+listaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[3]);
+listaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[4]);
 
-// Desmatriculación de algunos estudiantes en algunas aignaturas
-ListaEstudiantes.listaEst[0].desmatricular(listaAsignaturas.listaAsign[3]);
-ListaEstudiantes.listaEst[1].desmatricular(listaAsignaturas.listaAsign[2]);
-ListaEstudiantes.listaEst[2].desmatricular(listaAsignaturas.listaAsign[0]);
-ListaEstudiantes.listaEst[3].desmatricular(listaAsignaturas.listaAsign[4]);
+// Desmatriculación de algunos estudiantes en algunas asignaturas
+listaEstudiantes.listaEst[0].desmatricular(listaAsignaturas.listaAsign[3]);
+listaEstudiantes.listaEst[1].desmatricular(listaAsignaturas.listaAsign[2]);
+listaEstudiantes.listaEst[2].desmatricular(listaAsignaturas.listaAsign[0]);
+listaEstudiantes.listaEst[3].desmatricular(listaAsignaturas.listaAsign[4]);
 
 // Calificación de algunos estudiantes
-ListaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[1], 10);
-ListaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[2], 7.3);
+listaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[1], 10);
+listaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[2], 7.3);
 
-ListaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[0], 9.5);
-ListaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[3], 8);
-ListaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[4], 6.66);
+listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[0], 9.5);
+listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[3], 8);
+listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[4], 6.66);
 
-ListaEstudiantes.listaEst[2].calificar(listaAsignaturas.listaAsign[2], 8.2);
+listaEstudiantes.listaEst[2].calificar(listaAsignaturas.listaAsign[2], 8.2);
 
 // Bucle while
 let bandera = true;
 while(bandera){
+    console.log("\n");
     console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
     console.log("1. Crear un estudiante y su dirección");
     console.log("2. Crear una asignatura");
@@ -535,7 +537,7 @@ while(bandera){
     console.log("13. Reporte listado de estudiantes");
     console.log("0. Salir del sistema");
 
-    let opcion = Number.parseInt(window.prompt("Selecciona una de estas opciones: "));
+    opcion = window.prompt("Selecciona una de estas opciones: ");
 
     switch(opcion){
         case '1': {
@@ -600,33 +602,37 @@ while(bandera){
         }
 
         case '3': {
-            if(listaEstudiantes.listaEst.length === 0){
+            if (listaEstudiantes.listaEst.length === 0) {
                 console.log("No hay estudiantes registrados");
                 break;
             }
 
             console.clear();
             console.log("Lista de estudiantes: ");
-            for(const estudiante of listaEstudiantes.listaEst){
-                console.log(`${(listaEstudiantes.listaEst.indexOf(estudiante) + 1)}. ${estudiante.id} | ${estudiante.nombre}`);
+            for (const estudiante of listaEstudiantes.listaEst) {
+                console.log(`${listaEstudiantes.listaEst.indexOf(estudiante) + 1}. ${estudiante.id} | ${estudiante.nombre}`);
             }
 
-            let opcionEstSupr;
-            opcionEstSupr = Number.parseInt("Elige un estudiante a eliminar: ");
+            const opcionEstSupr = Number(prompt("Elige un estudiante a eliminar: "));
 
-            try{
+            if (isNaN(opcionEstSupr) || opcionEstSupr < 1 || opcionEstSupr > listaEstudiantes.listaEst.length) {
+                console.log("Opción no válida");
+                break;
+            }
+
+            try {
                 listaEstudiantes.eliminarEstudiante(listaEstudiantes.listaEst[opcionEstSupr - 1].id);
                 console.log("Estudiante eliminado sin errores");
-
-                for(const estudiante of listaEstudiantes.listaEst){
-                    if(listaEstudiantes.listaEst.length > 0){
-                        console.log(`${(listaEstudiantes.listaEst.indexOf(estudiante) + 1)}. ${estudiante.id} | ${estudiante.nombre}`);
-                    }else{
-                        console.log("No hay estudiantes registrados");
-                        break;
+        
+                if (listaEstudiantes.listaEst.length === 0) {
+                    console.log("No hay estudiantes registrados");
+                } else {
+                    console.log("Lista de estudiantes actualizada: ");
+                    for (const estudiante of listaEstudiantes.listaEst) {
+                        console.log(`${listaEstudiantes.listaEst.indexOf(estudiante) + 1}. ${estudiante.id} | ${estudiante.nombre}`);
                     }
                 }
-            }catch(err){
+            } catch (err) {
                 console.log("Error durante el proceso de eliminación del estudiante");
             }
             break;
@@ -840,6 +846,7 @@ while(bandera){
         }
 
         case '0': {
+            console.clear();
             console.log("Saliendo...");
             bandera = false;
         }
