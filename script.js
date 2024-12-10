@@ -327,11 +327,6 @@ class Asignatura{
             this.#calificaciones.splice(indiceCal, 1);
         }
     }
-
-    // Muestra un string del nombre de cada asignatura
-    toString() {
-        return this.#nombre;
-    }
 }
 
 // Clase para representar la lista de estudiantes
@@ -522,9 +517,8 @@ ListaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[4], 6.66);
 ListaEstudiantes.listaEst[2].calificar(listaAsignaturas.listaAsign[2], 8.2);
 
 // Bucle while
-
-while(true){
-    console.clear();
+let bandera = true;
+while(bandera){
     console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
     console.log("1. Crear un estudiante y su dirección");
     console.log("2. Crear una asignatura");
@@ -535,8 +529,10 @@ while(true){
     console.log("7. Desmatricular un estudiante");
     console.log("8. Calificar a un estudiante en una asignatura");
     console.log("9. Registros de matriculaciones y desmatriculaciones");
-    console.log("10. Promedios");
-    console.log("11. Reporte listado de estudiantes");
+    console.log("10. Promedio de un estudiante");
+    console.log("11. Promedio de una asignatura");
+    console.log("12. Promedio general de estudiantes");
+    console.log("13. Reporte listado de estudiantes");
     console.log("0. Salir del sistema");
 
     let opcion = Number.parseInt(window.prompt("Selecciona una de estas opciones: "));
@@ -604,9 +600,252 @@ while(true){
         }
 
         case '3': {
-            
+            if(listaEstudiantes.listaEst.length === 0){
+                console.log("No hay estudiantes registrados");
+                break;
+            }
+
+            console.clear();
+            console.log("Lista de estudiantes: ");
+            for(const estudiante of listaEstudiantes.listaEst){
+                console.log(`${(listaEstudiantes.listaEst.indexOf(estudiante) + 1)}. ${estudiante.id} | ${estudiante.nombre}`);
+            }
+
+            let opcionEstSupr;
+            opcionEstSupr = Number.parseInt("Elige un estudiante a eliminar: ");
+
+            try{
+                listaEstudiantes.eliminarEstudiante(listaEstudiantes.listaEst[opcionEstSupr - 1].id);
+                console.log("Estudiante eliminado sin errores");
+
+                for(const estudiante of listaEstudiantes.listaEst){
+                    if(listaEstudiantes.listaEst.length > 0){
+                        console.log(`${(listaEstudiantes.listaEst.indexOf(estudiante) + 1)}. ${estudiante.id} | ${estudiante.nombre}`);
+                    }else{
+                        console.log("No hay estudiantes registrados");
+                        break;
+                    }
+                }
+            }catch(err){
+                console.log("Error durante el proceso de eliminación del estudiante");
+            }
+            break;
         }
 
+        case '4':{
+            if(listaAsignaturas.listaAsign.length === 0){
+                console.log("No hay asignaturas registradas");
+                break;
+            }
 
+            console.clear();
+            console.log("Lista de asignaturas: ");
+            for(const asignatura of listaAsignaturas.listaAsign){
+                console.log(`${(listaAsignaturas.listaAsign.indexOf(asignatura) + 1)}. ${asignatura.nombre}`);
+            }
+
+            let opcionAsignSupr;
+            opcionAsignSupr = Number.parseInt("Elige una asignatura a eliminar: ");
+
+            try{
+                listaAsignaturas.eliminarAsignatura(listaAsignaturas.listaAsign[opcionAsignSupr - 1].nombre);
+                console.log("Asignatura eliminada sin errores");
+
+                for(const asignatura of listaAsignaturas.listaAsign){
+                    if(listaAsignaturas.listaAsign.length > 0){
+                        console.log(`${(listaAsignaturas.listaAsign.indexOf(asignatura) + 1)}. ${asignatura.nombre}`);
+                    }else{
+                        console.log("No hay asignaturas registradas");
+                        break;
+                    }
+                }
+            }catch(err){
+                console.log("Error durante el proceso de eliminación de la asignatura");
+            }
+            break;
+        }
+
+        case '5': {
+            console.clear();
+            const nombreEstBuscar = window.prompt("Dime el nombre de un estudiante a buscar: ");
+            console.log(`Nombre a buscar: ${nombreEstBuscar}`)
+            const resultadoBusqueda = listaEstudiantes.buscarEstudiantes(nombreEstBuscar);
+            console.log("\nBuscando estudiantes...");
+
+            if(resultadoBusqueda.length === 1){
+                console.log(`Hay ${resultadoBusqueda.length} estudiante con el nombre ${nombreEstBuscar}`);
+            }else if(resultadoBusqueda.length > 1){
+                console.log(`Hay ${resultadoBusqueda.length} estudiantes con el nombre ${nombreEstBuscar}`);
+            }else{
+                console.log("No se ha encontrado ningún estudiante con ese nombre");
+                break;
+            }
+
+            for(const estudiante of resultadoBusqueda){
+                console.log(estudiante.toString());
+            }
+            break;
+        }
+
+        case '6': {
+            if(listaEstudiantes.listaEst.length === 0){
+                console.log("No hay estudiantes registrados");
+                break;
+            }
+            if(listaAsignaturas.listaAsign.length === 0){
+                console.log("No hay asignaturas registradas");
+                break;
+            }
+
+            console.clear();
+            console.log("Lista de estudiantes: ");
+
+            for(const estudiante of listaEstudiantes.listaEst){
+                console.log(`${(listaEstudiantes.listaEst.indexOf(estudiante) + 1)}. ${estudiante.id} | ${estudiante.nombre}`);
+            }
+
+            let opcionEstMat;
+            opcionEstMat = Number.parseInt(window.prompt("Elige un estudiante: "));
+
+            const estudiante = listaEstudiantes.listaEst[opcionEstMat - 1];
+
+            if(estudiante.asignaturas.length === listaAsignaturas.listaAsign.length){
+                console.log("El estudiante está matriculado en todas las asignaturas");
+                continue;
+            }
+
+            let asignaturasElegidasEst = [];
+            const asignaturasMatriculadas = estudiante.asignaturas.map(a => a[0].nombre);
+            const asignaturasSinMatricular = listaAsignaturas.listaAsign.filter(a => !asignaturasMatriculadas.includes(a.nombre));
+
+            console.clear();
+            console.log(`Estudiante a matricular: ${estudiante.id} | ${estudiante.nombre}`);
+            console.log("Lista de asignaturas: ");
+            let asignElegidas = asignaturasElegidasEst.length + " - ";
+            if(asignaturasElegidasEst.length > 0){
+                asignElegidas += asignaturasElegidasEst.map(a => a.nombre).join(" | ");
+            }
+
+            console.log(asignElegidas);
+
+            for(const asignatura of asignaturasSinMatricular){
+                if(asignaturasElegidasEst.includes(asignatura)){
+                    const marcaSeleccion = "X"
+                }else{
+                    const marcaSeleccion = "";
+                }
+
+                console.log(`${marcaSeleccion} ${(asignaturasSinMatricular.indexOf(asignatura) + 1)}. ${asignatura.nombre}`);
+            }
+
+            let opcionElegirAsignMat;
+            opcionElegirAsignMat = window.prompt("Elige las asignaturas: ");
+            let eleccionAsignMat;
+            eleccionAsignMat = Number.parseInt(opcionElegirAsignMat);
+
+            if(eleccionAsignMat > 0 && eleccionAsignMat <= asignaturasSinMatricular.length){
+                const indiceAsignaturaMat = asignaturasSinMatricular[eleccionAsignMat - 1];
+                if(asignaturasElegidasEst.includes(indiceAsignaturaMat)){
+                    asignaturasElegidasEst = asignaturasElegidasEst.filter(a => a != indiceAsignaturaMat);
+                }else{
+                    asignaturasElegidasEst.push(indiceAsignaturaMat)
+                }
+            }else if(eleccionAsignMat === 0){
+                break;
+            }else{
+                if(asignaturasElegidasEst.length > 0){
+                    estudiante.matricular(...asignaturasElegidasEst);
+
+                    console.clear();
+                    console.log("Estudiante matriculado sin errores");
+                    console.log(`Estudiante: ${estudiante.id} | ${estudiante.nombre}`);
+                    console.log(`${asignaturasElegidasEst.length} asignaturas elegidas: ${asignaturasElegidasEst.map(a => a.nombre.join(" - "))}`);
+                    break;
+                }else{
+                    console.log("Se tiene que elegir como mínimo una asignatura");
+                }
+            }
+            break;
+        }
+
+        case '7': {
+            if(listaEstudiantes.listaEst.every(e => e.asignaturas.length === 0)){
+                console.log("No hay ningún estudiante matriculado");
+                break;
+            }
+
+            const listaEstMat = listaEstudiantes.listaEst.filter(e => e.asignaturas.length > 0);
+
+            console.clear();
+            console.log("Lista de estudiantes");
+            for(const estudianteMat of listaEstMat){
+                console.log(`${(listaEstMat.indexOf(estudianteMat) + 1)}. ${estudianteMat.id} | ${estudianteMat.nombre}`);
+            }
+
+            let opcionEstDesmat;
+            opcionEstDesmat = Number.parseInt(window.prompt("Elige un estudiante: "));
+
+            const estudiante = listaEstMat[opcionEstDesmat - 1];
+
+            let asignaturasElegidasEst = [];
+
+            console.clear();
+            console.log("Lista de asignaturas del estudiante: ");
+            
+            let asignElegidas = asignaturasElegidasEst.length + " - ";
+            if(asignaturasElegidasEst.length > 0){
+                asignElegidas += asignaturasElegidasEst.map(a => a.nombre).join(" | ");
+            }
+
+            console.log(asignElegidas);
+
+            for(const asignatura of estudiante.asignaturas){
+                if(asignaturasElegidasEst.includes(asignatura)){
+                    const marcaSeleccion = "X"
+                }else{
+                    const marcaSeleccion = "";
+                }
+
+                console.log(`${marcaSeleccion} ${(asignaturasSinMatricular.indexOf(asignatura) + 1)}. ${asignatura.nombre}`);
+            }
+
+            let opcionElegirAsignDesmat;
+            opcionElegirAsignDesmat = window.prompt("Elige las asignaturas: ");
+            let eleccionAsignDesmat;
+            eleccionAsignDesmat = Number.parseInt(opcionElegirAsignDesmat);
+
+            if(eleccionAsignDesmat > 0 && eleccionAsignDesmat <= estudiante.asignaturas.length){
+                const indiceAsignaturaDesmat = estudiante.asignaturas[eleccionAsignDesmat - 1][0];
+                
+                if(asignaturasElegidasEst.includes(indiceAsignaturaDesmat)){
+                    asignaturasElegidasEst = asignaturasElegidasEst.filter(a => a != indiceAsignaturaDesmat);
+                }else{
+                    asignaturasElegidasEst.push(indiceAsignaturaDesmat);
+                }
+            }else if(eleccionAsignDesmat === 0){
+                break;
+            }else{
+                if(asignaturasElegidasEst.length > 0){
+                    estudiante.desmatricular(...asignaturasElegidasEst);
+
+                    console.clear();
+                    console.log("Estudiante desmatriculado sin errores");
+                    console.log(`Estudiante: ${estudiante.id} | ${estudiante.nombre}`);
+                    console.log(`${asignaturasElegidasEst.length} asignaturas elegidas: ${asignaturasElegidasEst.map(a => a.nombre.join(" - "))}`);
+                }else{
+                    console.log("Se tiene que elegir como mínimo una asignatura");
+                }
+            }
+            break;
+        }
+
+        case '0': {
+            console.log("Saliendo...");
+            bandera = false;
+        }
+
+        default: {
+            console.log("Opción no válida");
+        }
     }
 }
