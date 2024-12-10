@@ -35,7 +35,7 @@ class Persona{
 
     // Método privado para validar el nombre (solo letras, tíldes y espacios)
     #validarNombre(nombre) {
-        return typeof nombre === 'string' && /^[a-zA-ZáéíóúüÁÉÍÓÚÜ\s]+$/.test(nombre);
+        return typeof nombre === "string" && /^[a-zA-ZáéíóúüÁÉÍÓÚÜ\s]+$/.test(nombre);
     }
 
     // Método privado para validar la edad (número entero entre 1 y 99)
@@ -255,7 +255,7 @@ class Estudiante extends Persona{
         }
 
         const suma = notas.reduce((sumacc, asign) => sumacc += asign[1], 0);
-        return Math.round(suma / notas.length)
+        return Math.round(suma / notas.length);
     }
 
     // Metodo estatico para la llamada del atributo estatico de idsUsados para eliminar un id Ocupado y así desocuparlo
@@ -280,7 +280,7 @@ class Asignatura{
 
     constructor(nombre) {
         // Validación del nombre que solo puede contener letras, tildes y espacios, de lo contratio, devolverá "Asignatura no especificada"
-        if(/^[a-zA-ZáéíóúüÁÉÍÓÚÜ\sIV]+$/.test(nombre)){
+        if(/^[a-zA-ZáéíóúüÁÉÍÓÚÜ\sIVXLCDM]+$/.test(nombre)){
             this.#nombre = nombre;
         }else{
             this.#nombre = "Asignatura no especificada";
@@ -449,7 +449,7 @@ class ListaAsignaturas{
 }
 
 /**
- * 3. Programa Principal.
+ * Programa Principal.
  * 
  * En esta sección se declara un objeto ListaEstudiantes, otro objeto ListaAsignaturas, y un Array de objetos
  * Direccion llamado listaDirecciones. Seguidamente, se entra en el bucle while.
