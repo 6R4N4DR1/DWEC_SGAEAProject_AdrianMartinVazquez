@@ -206,7 +206,11 @@ class Estudiante extends Persona{
         if (this.#asignaturas.some(asig => asig.nombre === asignatura.nombre)) {
             throw new Error("El estudiante ya está matriculado en esta asignatura.");
         }
+        // Matricula al estudiante y agrega el registro
         this.#asignaturas.push(asignatura);
+        // Agrega el registro de la matriculación
+        const fechaActual = new Date();
+        this.#registros.push(["Matriculado", asignatura.nombre, fechaActual]);
     }
 
     // Método para desmatricular a un estudiante de una asignatura
@@ -217,7 +221,10 @@ class Estudiante extends Persona{
         if (indice === -1) {
             throw new Error("El estudiante no está matriculado en esta asignatura.");
         }
+        // Elimina la asignatura y agrega el registro de desmatriculación
         this.asignaturas.splice(indice, 1);
+        const fechaActual = new Date();
+        this.#registros.push(["Desmatriculado", asignatura.nombre, fechaActual]);
     }
 
     // Método para calificar a un estudiante en una asignatura
@@ -804,6 +811,130 @@ while(bandera){
                 console.log(`El estudiante ${estudianteSeleccionado.nombre} se ha desmatriculado de ${asignaturaSeleccionada.nombre}.`);
             } catch (err) {
                 console.log(err.message);
+            }
+            break;
+        }
+
+        case '8': {
+            if (listaEstudiantes.listaEst.length === 0) {
+                console.log("No hay estudiantes registrados.");
+                break;
+            }
+            if (listaAsignaturas.listaAsign.length === 0) {
+                console.log("No hay asignaturas registradas.");
+                break;
+            }
+        
+            console.clear();
+            console.log("Lista de estudiantes:");
+            listaEstudiantes.listaEst.forEach((estudiante, index) => {
+                console.log(`${index + 1}. ${estudiante.nombre}`);
+            });
+        
+            const opcionEstCal = Number(prompt("Elige un estudiante para calificar: "));
+        
+            if (isNaN(opcionEstCal) || opcionEstCal < 1 || opcionEstCal > listaEstudiantes.listaEst.length) {
+                console.log("Opción no válida.");
+                break;
+            }
+        
+            const estudianteElegido = listaEstudiantes.listaEst[opcionEstCal - 1];
+        
+            console.log(`Estudiante seleccionado: ${estudianteElegido.nombre}`);
+            console.log("Asignaturas matriculadas:");
+            estudianteElegido.asignaturas.forEach((asignatura, indice) => {
+                console.log(`${indice + 1}. ${asignatura.nombre}`);
+            });
+        
+            const opcionAsigCal = Number(prompt("Elige una asignatura para calificar: "));
+        
+            if (isNaN(opcionAsigCal) || opcionAsigCal < 1 || opcionAsigCal > estudianteElegido.asignaturas.length) {
+                console.log("Opción no válida.");
+                break;
+            }
+        
+            const asignaturaSeleccionada = estudianteElegido.asignaturas[opcionAsigCal - 1];
+        
+            const nota = Number(prompt(`Introduce la calificación para ${asignaturaSeleccionada.nombre}: `));
+        
+            if (isNaN(nota) || nota < 0 || nota > 10) {
+                console.log("Calificación no válida. Debe ser un número entre 0 y 10.");
+                break;
+            }
+        
+            try {
+                estudianteElegido.calificar(asignaturaSeleccionada, nota);
+                console.log(`Asignatura ${asignaturaSeleccionada.nombre} calificada con ${nota}.`);
+            } catch (err) {
+                console.log("Error al calificar:", err.message);
+            }
+            break;
+        }
+
+        case '9': {
+            if (listaEstudiantes.listaEst.length === 0) {
+                console.log("No hay estudiantes registrados.");
+                break;
+            }
+        
+            console.clear();
+            console.log("Lista de estudiantes:");
+            listaEstudiantes.listaEst.forEach((estudiante, index) => {
+                console.log(`${index + 1}. ${estudiante.nombre}`);
+            });
+        
+            const opcionEstReg = Number(prompt("Elige un estudiante para ver sus registros: "));
+        
+            if (isNaN(opcionEstReg) || opcionEstReg < 1 || opcionEstReg > listaEstudiantes.listaEst.length) {
+                console.log("Opción no válida.");
+                break;
+            }
+        
+            const estudianteElegido = listaEstudiantes.listaEst[opcionEstReg - 1];
+        
+            console.log(`Registros de matriculaciones y desmatriculaciones de ${estudianteElegido.nombre}:`);
+            const registros = estudianteElegido.registros;
+        
+            if (registros.length === 0) {
+                console.log("Este estudiante no tiene registros de matriculaciones o desmatriculaciones.");
+            } else {
+                registros.forEach((registro, indice) => {
+                    console.log(`${indice + 1}. ${registro}`);
+                });
+            }
+            break;
+        }
+
+        case '9': {
+            if (listaEstudiantes.listaEst.length === 0) {
+                console.log("No hay estudiantes registrados.");
+                break;
+            }
+        
+            console.clear();
+            console.log("Lista de estudiantes:");
+            listaEstudiantes.listaEst.forEach((estudiante, index) => {
+                console.log(`${index + 1}. ${estudiante.nombre}`);
+            });
+        
+            const opcionEstReg = Number(window.prompt("Elige un estudiante para ver sus registros: "));
+        
+            if (isNaN(opcionEstReg) || opcionEstReg < 1 || opcionEstReg > listaEstudiantes.listaEst.length) {
+                console.log("Opción no válida.");
+                break;
+            }
+        
+            const estudianteElegido = listaEstudiantes.listaEst[opcionEstReg - 1];
+        
+            console.log(`\nRegistros de matriculaciones y desmatriculaciones de ${estudianteElegido.nombre}:`);
+            const registros = estudianteElegido.registros;
+        
+            if (registros.length === 0) {
+                console.log("Este estudiante no tiene registros de matriculaciones o desmatriculaciones.");
+            } else {
+                registros.forEach((registro, indice) => {
+                    console.log(`${indice + 1}. ${registro}`);
+                });
             }
             break;
         }
