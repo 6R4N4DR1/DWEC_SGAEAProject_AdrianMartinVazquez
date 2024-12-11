@@ -19,7 +19,7 @@ class Persona{
         }
 
         // Validación de la edad, si es válida se asigna, de lo contrario, se asigna 0
-        if(Number.isInteger(edad) && edad > 0 && edad < 100){
+        if(edad > 0 && edad < 100){
             this.#edad = edad
         }else{
             this.#edad = 0;
@@ -60,7 +60,7 @@ class Direccion{
             this.#calle = "Sin Nombre";
         }
 
-        if(Number.isInteger(numero) && numero > 0){
+        if(numero > 0){
             this.#numero = numero;
         }else{
             this.#numero = 0;
@@ -152,11 +152,12 @@ class Estudiante extends Persona{
         this.#id = numeroId; // El id se instancia con el numeroId obtenido
         
         // Validacion de que el atributo direccion que se pasa como parametro sea un objeto de la clase Direccion 
-        if (!direccion || typeof direccion !== "object") {
+        if (!(direccion instanceof Direccion)) {
             throw new Error("Dirección no válida");
         }else{
             this.#direccion = direccion;
         }
+        
         this.#asignaturas = []; // Inicialización del array de asignaturas
         this.#registros = []; // Inicialización del array de registros
     }
@@ -202,47 +203,33 @@ class Estudiante extends Persona{
     matricular(asignatura) {
         // Si el elemento nombre del array asignaturas que se encuentra en el primer valor de la matriz (0) no tiene dentro el nombre de la asignatura que se pasa como parametro
         // Se mete una nueva asignatura al array de asignaturas y como segundo valor de la matriz sin calificar y se mete tambien el registro de la matriculación
-        if (!this.#asignaturas.map(a => a[0].nombre).includes(asignatura.nombre)) {
-            this.#asignaturas.push([ asignatura, "Sin calificar" ]);
-            this.#registros.push(["Matriculación", asignatura.nombre, new Date()]);
+        if (this.#asignaturas.some(asig => asig.nombre === asignatura.nombre)) {
+            throw new Error("El estudiante ya está matriculado en esta asignatura.");
         }
+        this.#asignaturas.push(asignatura);
     }
 
     // Método para desmatricular a un estudiante de una asignatura
     desmatricular(asignatura) {
         // Si el elemento nombre del array asignaturas que se encuentra en el primer valor de la matriz (0) no tiene el nombre de la asignatura que se pasa como parametro
         // Manda un error, de lo contrario, se rehace el array asignaturas eliminando la asignatura pasada como parametro, y se hace un nuevo registro
-        if(!this.#asignaturas.map(a => a[0].nombre).includes(asignatura.nombre)){
-            throw new Error("No hay estudiante matriculado en esta asignatura");
-        }else{
-            this.#asignaturas = this.#asignaturas.filter(a => a[0].nombre !== asignatura.nombre);
-            this.#registros.push(["Desmatriculación", asignatura.nombre, new Date()]);
+        const indice = this.asignaturas.findIndex(asig => asig.nombre === asignatura.nombre);
+        if (indice === -1) {
+            throw new Error("El estudiante no está matriculado en esta asignatura.");
         }
+        this.asignaturas.splice(indice, 1);
     }
 
     // Método para calificar a un estudiante en una asignatura
     calificar(asignatura, nota) {
-        // Si el elemento nombre del array asignaturas que se encuentra en el primer valor de la matriz (0) no tiene dentro el nombre de la asignatura que se pasa como parametro
-        // Devuelve un error
-        if(!this.#asignaturas.map(a => a[0].nombre).includes(asignatura.nombre)){
-            throw new Error("No hay estudiante matriculado en esta asignatura");
+        // Verifica si la asignatura está en la lista de asignaturas del estudiante
+        const asignaturaMatriculada = this.asignaturas.find(asig => asig.nombre === asignatura.nombre);
+        if (!asignaturaMatriculada) {
+            throw new Error(`El estudiante no está matriculado en la asignatura ${asignatura.nombre}`);
         }
-
-        // Si el elemento nota no es un numero y el numero es menor de 0 o mayor de 10 entonces devuelve un error
-        if (typeof nota !== "number" || nota < 0 || nota > 10){
-            throw new Error("La nota tiene que ser entre 0 y 10");
-        }
-
-        // Se itera el array de asignaturas añadiendo por asignatura que se pasa como parametro su calificacion que es el segundo valor de la matriz (1)
-        // Además se agregar esa nueva calificación a la asignatura mediante el metodo de Asignatura de agregarCalificacion, una vez se encuentre el nombre
-        // de la asignatura que se paso como parametro y se hagan estas asignaciones, se sale del bucle
-        for(const asign of this.#asignaturas){
-            if(asign[0].nombre === asignatura.nombre){
-                asign[1] = parseFloat(nota.toFixed(2));
-                asignatura.agregarCalificacion(nota);
-                break;
-            }
-        }
+        // Si está matriculado, entonces se califica
+        asignaturaMatriculada.nota = nota;
+        console.log(`La asignatura ${asignatura.nombre} ha sido calificada con ${nota}`);
     }
 
     // Getter para calcular el promedio de notas de un estudiante
@@ -423,7 +410,11 @@ class ListaAsignaturas{
 
     // Agregar una asignatura a la lista si todavía no esta dentro
     agregarAsignatura(asignatura) {
-        if (this.#listaAsign.filter(a => a.nombre === asignatura.nombre).length != 0) {
+        if (!(asignatura instanceof Asignatura)) {
+            throw new Error("El parámetro debe ser instancia de la clase Asignatura");
+        }
+
+        if (this.#listaAsign.some(a => a.nombre === asignatura.nombre)) {
             throw new Error("La asignatura ya está en la lista");
         } else {
             this.#listaAsign.push(asignatura);
@@ -462,12 +453,16 @@ const estudiante2 = new Estudiante("Sara Garzón", 19, listaDirecciones[1]);
 const estudiante3 = new Estudiante("Lorenzo Rodriguez", 21, listaDirecciones[2]);
 const estudiante4 = new Estudiante("Alonso Hernández", 21, listaDirecciones[3]);
 const estudiante5 = new Estudiante("Alex Galán", 20, listaDirecciones[4]);
+try{
+    listaEstudiantes.agregarEstudiante(estudiante1);
+    listaEstudiantes.agregarEstudiante(estudiante2);
+    listaEstudiantes.agregarEstudiante(estudiante3);
+    listaEstudiantes.agregarEstudiante(estudiante4);
+    listaEstudiantes.agregarEstudiante(estudiante5);
+}catch(err){
+    console.log("Error al agregar un estudiante:", err.message);
+}
 
-listaEstudiantes.agregarEstudiante(estudiante1);
-listaEstudiantes.agregarEstudiante(estudiante2);
-listaEstudiantes.agregarEstudiante(estudiante3);
-listaEstudiantes.agregarEstudiante(estudiante4);
-listaEstudiantes.agregarEstudiante(estudiante5);
 
 // Inicialización de asignaturas (5 asignaturas de prueba)
 const asignatura1 = new Asignatura("DWEC");
@@ -475,47 +470,66 @@ const asignatura2 = new Asignatura("DWES");
 const asignatura3 = new Asignatura("Despliegue de Aplicaciones Web");
 const asignatura4 = new Asignatura("DIW");
 const asignatura5 = new Asignatura("Inglés");
+try{
+    listaAsignaturas.agregarAsignatura(asignatura1);
+    listaAsignaturas.agregarAsignatura(asignatura2);
+    listaAsignaturas.agregarAsignatura(asignatura3);
+    listaAsignaturas.agregarAsignatura(asignatura4);
+    listaAsignaturas.agregarAsignatura(asignatura5);
+}catch (err){
+    console.log("Error al agregar una asignatura:", err.message);
+}
 
-listaAsignaturas.agregarAsignatura(asignatura1);
-listaAsignaturas.agregarAsignatura(asignatura2);
-listaAsignaturas.agregarAsignatura(asignatura3);
-listaAsignaturas.agregarAsignatura(asignatura4);
-listaAsignaturas.agregarAsignatura(asignatura5);
+
 
 // Matriculación de estudiantes en algunas asignaturas
-listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[0]);
-listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[1]);
-listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[2]);
-listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[3]);
-listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[4]);
+try{
+    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[0]);
+    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[1]);
+    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[2]);
+    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[3]);
+    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[4]);
 
-listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[0]);
-listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[2]);
-listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[3]);
-listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[4]);
+    listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[0]);
+    listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[2]);
+    listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[3]);
+    listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[4]);
 
-listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[0]);
-listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[1]);
-listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[2]);
+    listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[0]);
+    listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[1]);
+    listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[2]);
 
-listaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[3]);
-listaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[4]);
+    listaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[3]);
+    listaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[4]);
+}catch(err){
+    console.log("Error al matricular:", err.message);
+}
+
 
 // Desmatriculación de algunos estudiantes en algunas asignaturas
-listaEstudiantes.listaEst[0].desmatricular(listaAsignaturas.listaAsign[3]);
-listaEstudiantes.listaEst[1].desmatricular(listaAsignaturas.listaAsign[2]);
-listaEstudiantes.listaEst[2].desmatricular(listaAsignaturas.listaAsign[0]);
-listaEstudiantes.listaEst[3].desmatricular(listaAsignaturas.listaAsign[4]);
+try{
+    listaEstudiantes.listaEst[0].desmatricular(listaAsignaturas.listaAsign[3]);
+    listaEstudiantes.listaEst[1].desmatricular(listaAsignaturas.listaAsign[2]);
+    listaEstudiantes.listaEst[2].desmatricular(listaAsignaturas.listaAsign[0]);
+    listaEstudiantes.listaEst[3].desmatricular(listaAsignaturas.listaAsign[4]);
+}catch(err){
+    console.log("Error al desmatricular:", err.message);
+}
+
 
 // Calificación de algunos estudiantes
-listaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[1], 10);
-listaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[2], 7.3);
+try {
+    listaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[1], 10);  // Ejemplo con asignatura válida
+    listaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[2], 7.3);
+    
+    listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[0], 9.5);
+    listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[3], 8);
+    listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[4], 6.66);
 
-listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[0], 9.5);
-listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[3], 8);
-listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[4], 6.66);
-
-listaEstudiantes.listaEst[2].calificar(listaAsignaturas.listaAsign[2], 8.2);
+    listaEstudiantes.listaEst[2].calificar(listaAsignaturas.listaAsign[2], 8.2);
+} catch (err) {
+    console.log("Error al calificar:", err.message);
+}
 
 // Bucle while
 let bandera = true;
@@ -701,153 +715,95 @@ while(bandera){
 
         case '6': {
             if (listaEstudiantes.listaEst.length === 0) {
-                console.log("No hay estudiantes registrados");
-                break;
-            }
-            if (listaAsignaturas.listaAsign.length === 0) {
-                console.log("No hay asignaturas registradas");
+                console.log("No hay estudiantes registrados.");
                 break;
             }
         
             console.clear();
-            console.log("Lista de estudiantes: ");
-            listaEstudiantes.listaEst.forEach((estudiante, indice) => {
-                console.log(`${indice + 1}. ${estudiante.id} | ${estudiante.nombre}`);
+            console.log("Lista de estudiantes:");
+            listaEstudiantes.listaEst.forEach((estudiante, index) => {
+                console.log(`${index + 1}. ${estudiante.nombre}`);
             });
         
-            const opcionEstMat = Number(prompt("Elige un estudiante (número): "));
+            const opcionEstMat = Number(prompt("Elige un estudiante para matricular: "));
         
             if (isNaN(opcionEstMat) || opcionEstMat < 1 || opcionEstMat > listaEstudiantes.listaEst.length) {
-                console.log("Opción no válida");
+                console.log("Opción no válida.");
                 break;
             }
         
-            const estudiante = listaEstudiantes.listaEst[opcionEstMat - 1];
+            const estudianteSeleccionado = listaEstudiantes.listaEst[opcionEstMat - 1];
         
-            if (estudiante.asignaturas.length === listaAsignaturas.listaAsign.length) {
-                console.log("El estudiante ya está matriculado en todas las asignaturas");
+            console.clear();
+            console.log("Lista de asignaturas:");
+            listaAsignaturas.listaAsign.forEach((asignatura, index) => {
+                console.log(`${index + 1}. ${asignatura.nombre}`);
+            });
+        
+            const opcionAsigMat = Number(prompt("Elige una asignatura para matricular: "));
+        
+            if (isNaN(opcionAsigMat) || opcionAsigMat < 1 || opcionAsigMat > listaAsignaturas.listaAsign.length) {
+                console.log("Opción no válida.");
                 break;
             }
         
-            const asignaturasMatriculadas = estudiante.asignaturas.map((a) => a.nombre);
-            const asignaturasSinMatricular = listaAsignaturas.listaAsign.filter((a) => !asignaturasMatriculadas.includes(a.nombre));
+            const asignaturaSeleccionada = listaAsignaturas.listaAsign[opcionAsigMat - 1];
         
-            const asignaturasElegidasEst = [];
-            let salir = false;
-        
-            while (!salir) {
-                console.clear();
-                console.log(`Estudiante: ${estudiante.id} | ${estudiante.nombre}`);
-                console.log("Asignaturas elegidas: ");
-        
-                if (asignaturasElegidasEst.length > 0) {
-                    console.log(asignaturasElegidasEst.map((a) => a.nombre).join(" | "));
-                } else {
-                    console.log("Ninguna");
-                }
-        
-                console.log("\nAsignaturas libres para matricular: ");
-                asignaturasSinMatricular.forEach((asignatura, indice) => {
-                    const marcaAsign = asignaturasElegidasEst.includes(asignatura) ? "X" : " ";
-                    console.log(`[${marcaAsign}] ${indice + 1}. ${asignatura.nombre}`);
-                });
-        
-                console.log("0. Finalizar selección");
-        
-                const opcionElegirAsignMat = Number(prompt("Elige una asignatura por número o escribe 0 para terminar la selección: "));
-        
-                if (opcionElegirAsignMat === 0) {
-                    if (asignaturasElegidasEst.length > 0) {
-                        estudiante.matricular(...asignaturasElegidasEst);
-                        console.clear();
-                        console.log("Estudiante matriculado sin errores");
-                        console.log(`Estudiante: ${estudiante.id} | ${estudiante.nombre}`);
-                        console.log(`${asignaturasElegidasEst.length} asignaturas elegidas: ${asignaturasElegidasEst.map((a) => a.nombre).join(" - ")}`);
-                    } else {
-                        console.log("Se tiene que elegir como mínimo una asignatura");
-                    }
-                    salir = true;
-                } else if (opcionElegirAsignMat > 0 && opcionElegirAsignMat <= asignaturasSinMatricular.length) {
-                    const asignaturaElegida = asignaturasSinMatricular[opcionElegirAsignMat - 1];
-                    if (asignaturasElegidasEst.includes(asignaturaElegida)) {
-                        asignaturasElegidasEst.splice(asignaturasElegidasEst.indexOf(asignaturaElegida), 1);
-                    } else {
-                        asignaturasElegidasEst.push(asignaturaElegida);
-                    }
-                } else {
-                    console.log("Opción inválida");
-                }
+            try {
+                estudianteSeleccionado.matricular(asignaturaSeleccionada);
+                console.log(`El estudiante ${estudianteSeleccionado.nombre} se ha matriculado en ${asignaturaSeleccionada.nombre}.`);
+            } catch (err) {
+                console.log(err.message);
             }
             break;
         }
 
         case '7': {
-            if(listaEstudiantes.listaEst.every(e => e.asignaturas.length === 0)){
-                console.log("No hay ningún estudiante matriculado");
+            if (listaEstudiantes.listaEst.length === 0) {
+                console.log("No hay estudiantes registrados.");
                 break;
             }
-
-            const listaEstMat = listaEstudiantes.listaEst.filter(e => e.asignaturas.length > 0);
-
+        
             console.clear();
-            console.log("Lista de estudiantes");
-            for(const estudianteMat of listaEstMat){
-                console.log(`${(listaEstMat.indexOf(estudianteMat) + 1)}. ${estudianteMat.id} | ${estudianteMat.nombre}`);
-            }
-
-            let opcionEstDesmat;
-            opcionEstDesmat = Number.parseInt(window.prompt("Elige un estudiante: "));
-
-            const estudiante = listaEstMat[opcionEstDesmat - 1];
-
-            let asignaturasElegidasEst = [];
-
-            console.clear();
-            console.log("Lista de asignaturas del estudiante: ");
-            
-            let asignElegidas = asignaturasElegidasEst.length + " - ";
-            if(asignaturasElegidasEst.length > 0){
-                asignElegidas += asignaturasElegidasEst.map(a => a.nombre).join(" | ");
-            }
-
-            console.log(asignElegidas);
-
-            for(const asignatura of estudiante.asignaturas){
-                if(asignaturasElegidasEst.includes(asignatura)){
-                    const marcaSeleccion = "X"
-                }else{
-                    const marcaSeleccion = "";
-                }
-
-                console.log(`${marcaSeleccion} ${(asignaturasSinMatricular.indexOf(asignatura) + 1)}. ${asignatura.nombre}`);
-            }
-
-            let opcionElegirAsignDesmat;
-            opcionElegirAsignDesmat = window.prompt("Elige las asignaturas: ");
-            let eleccionAsignDesmat;
-            eleccionAsignDesmat = Number.parseInt(opcionElegirAsignDesmat);
-
-            if(eleccionAsignDesmat > 0 && eleccionAsignDesmat <= estudiante.asignaturas.length){
-                const indiceAsignaturaDesmat = estudiante.asignaturas[eleccionAsignDesmat - 1][0];
-                
-                if(asignaturasElegidasEst.includes(indiceAsignaturaDesmat)){
-                    asignaturasElegidasEst = asignaturasElegidasEst.filter(a => a != indiceAsignaturaDesmat);
-                }else{
-                    asignaturasElegidasEst.push(indiceAsignaturaDesmat);
-                }
-            }else if(eleccionAsignDesmat === 0){
+            console.log("Lista de estudiantes:");
+            listaEstudiantes.listaEst.forEach((estudiante, index) => {
+                console.log(`${index + 1}. ${estudiante.nombre}`);
+            });
+        
+            const opcionEstDesmat = Number(prompt("Elige un estudiante para desmatricular: "));
+        
+            if (isNaN(opcionEstDesmat) || opcionEstDesmat < 1 || opcionEstDesmat > listaEstudiantes.listaEst.length) {
+                console.log("Opción no válida.");
                 break;
-            }else{
-                if(asignaturasElegidasEst.length > 0){
-                    estudiante.desmatricular(...asignaturasElegidasEst);
-
-                    console.clear();
-                    console.log("Estudiante desmatriculado sin errores");
-                    console.log(`Estudiante: ${estudiante.id} | ${estudiante.nombre}`);
-                    console.log(`${asignaturasElegidasEst.length} asignaturas elegidas: ${asignaturasElegidasEst.map(a => a.nombre.join(" - "))}`);
-                }else{
-                    console.log("Se tiene que elegir como mínimo una asignatura");
-                }
+            }
+        
+            const estudianteSeleccionado = listaEstudiantes.listaEst[opcionEstDesmat - 1];
+        
+            if (estudianteSeleccionado.asignaturas.length === 0) {
+                console.log(`${estudianteSeleccionado.nombre} no está matriculado en ninguna asignatura.`);
+                break;
+            }
+        
+            console.clear();
+            console.log("Asignaturas de las que el estudiante está matriculado:");
+            estudianteSeleccionado.asignaturas.forEach((asignatura, index) => {
+                console.log(`${index + 1}. ${asignatura.nombre}`);
+            });
+        
+            const opcionAsigDesmat = Number(prompt("Elige una asignatura para desmatricular: "));
+        
+            if (isNaN(opcionAsigDesmat) || opcionAsigDesmat < 1 || opcionAsigDesmat > estudianteSeleccionado.asignaturas.length) {
+                console.log("Opción no válida.");
+                break;
+            }
+        
+            const asignaturaSeleccionada = estudianteSeleccionado.asignaturas[opcionAsigDesmat - 1];
+        
+            try {
+                estudianteSeleccionado.desmatricular(asignaturaSeleccionada);
+                console.log(`El estudiante ${estudianteSeleccionado.nombre} se ha desmatriculado de ${asignaturaSeleccionada.nombre}.`);
+            } catch (err) {
+                console.log(err.message);
             }
             break;
         }
