@@ -191,10 +191,6 @@ class Estudiante extends Persona{
 
     // Getter para obtener los registros de matriculación y desmatriculación con la fecha de cambio en español
     get registros(){
-        if(this.#registros.length === 0){
-            return [];
-        }
-
         return this.#registros.map(([accion, asignatura, fecha]) => {
             // Inicialización de arrays de días y meses en formato largo y en español
             const diasESP = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -214,8 +210,7 @@ class Estudiante extends Persona{
     // Método para matricular a un estudiante en una asignatura
     matricular(asignatura) {
         // Verifica si el estudiante ya está matriculado en la asignatura
-        const estudianteMatriculado = this.#asignaturas.some(asign => asign[0].nombreAsign === asignatura.nombreAsign);
-        if (estudianteMatriculado) {
+        if (this.#asignaturas.some(asign => asign[0].nombreAsign === asignatura.nombreAsign)) {
             throw new Error("El estudiante ya está matriculado en esta asignatura");
         }
         // Matricula al estudiante y agrega el registro
@@ -227,12 +222,11 @@ class Estudiante extends Persona{
     // Método para desmatricular a un estudiante de una asignatura
     desmatricular(asignatura) {
         // Busca la asignatura en la lista de asignaturas
-        const indice = this.#asignaturas.findIndex(asign => asign[0].nombreAsign === asignatura.nombreAsign);
-        if (indice === -1) {
+        if (this.#asignaturas.findIndex(asign => asign[0].nombreAsign === asignatura.nombreAsign) == -1) {
             throw new Error("El estudiante no está matriculado en esta asignatura");
         }
         // Elimina la asignatura y registra la desmatriculación
-        this.#asignaturas.splice(indice, 1);
+        this.#asignaturas = this.#asignaturas.filter(asign => asign[0].nombre != asignatura.nombre);
         const fechaActual = new Date();
         this.#registros.push(["Desmatriculado", asignatura.nombreAsign, fechaActual]);
     }
@@ -254,10 +248,10 @@ class Estudiante extends Persona{
 
     // Getter para calcular el promedio de notas de un estudiante
     promedioEstudiantes() {
+        // Creamos una constante que busca lista las notas de un estudiante
+        const notas = this.#asignaturas.filter(asign => !isNaN(asign[1]));
         // Filtra las asignaturas que tienen notas numéricas
-        const notas = this.#asignaturas.filter(asign => typeof asign[1] === "number");
-
-        if(notas.length === 0){
+        if(notas == 0){
             return "No hay calificaciones";
         }
 
@@ -283,12 +277,13 @@ class Estudiante extends Persona{
 
     // Método estático para liberar un ID usado
     static eliminarIdUsado(id){
-        const indiceId = Estudiante.#idsUsados.indexOf(id);
-
-        if(indiceId !== -1){
-            Estudiante.#idsUsados.splice(indiceId, 1);
+        // Se crea una constante que divida la letra E del los numeros del ID porque el array estatico solo contiene numeros
+        const numbId = parseInt(id.slice(1));
+        // Se valida si idsUsados no contiene ese ID, de lo contrario lo elimina
+        if(Estudiante.#idsUsados.findIndex(iU => iU === numbId) == -1){
+            throw new Error("El ID esta libre");
         }else{
-            console.error(`ID ${id} está libre`);
+            Estudiante.#idsUsados = Estudiante.#idsUsados.filter(iU => iU != numbId);
         }
     }
 
@@ -314,7 +309,7 @@ class Asignatura{
 
         // Validación del nombre de la asignatura
         // Solo permite letras, tildes, espacios y números romanos
-        if(typeof(nombreAsign) === "string" && /^[a-zA-ZáéíóúüÁÉÍÓÚÜ\sIVXLCDM]+$/.test(nombreAsign)){
+        if(typeof nombreAsign === "string" && /^[a-zA-ZáéíóúüÁÉÍÓÚÜ\sIVXLCDM]+$/.test(nombreAsign)){
             this.#nombreAsign = nombreAsign; // Asigna el nombre si es válido
         }else{
             // Si el nombre no es válido, lanza un error
@@ -343,7 +338,7 @@ class Asignatura{
     // Getter para obtener el promedio de las calificaciones
     promedioAsignaturas() {
         // Si no hay calificaciones, retorna 0
-        if(this.#calificaciones.length === 0){
+        if(this.#calificaciones.length == 0){
             return 0;
         } else {
             // Si hay calificaciones, calcula el promedio
@@ -354,17 +349,13 @@ class Asignatura{
 
     // Método para eliminar una calificación si existe en el array
     eliminarCalificacion(nota) {
-
-        // Busca el índice de la calificación en el array
-        const indiceNota = this.#calificaciones.indexOf(nota);
-
         // Si la calificación no está en el array, lanza un error
-        if (indiceNota === -1) {
+        if (this.#calificaciones.indexOf(nota) == -1) {
             throw new Error(`La calificación ${nota} no se encuentra en la asignatura ${this.#nombreAsign}`);
         }
 
         // Si la calificación está en el array, la elimina
-        this.#calificaciones.splice(indiceNota, 1);
+        this.#calificaciones = this.#calificaciones.filter(cal => cal != nota);
     }
 
     // Método que convierte la asignatura a un formato de texto (string)
@@ -401,30 +392,28 @@ class ListaEstudiantes{
 
     // Método para eliminar un estudiante de la lista por su id
     eliminarEstudiante(id) {
-        // Busca el índice del estudiante en la lista por su id
-        const indiceEst = this.#listaEst.findIndex(est => est.id === id);
-
         // Si el estudiante no está en la lista, lanza un error
-        if(indiceEst === -1){
+        if(this.#listaEst.findIndex(est => est.id === id) == -1){
             throw new Error("El estudiante no está en la lista");
         }
 
         // Elimina el estudiante encontrado en el índice
-        this.#listaEst.splice(indiceEst, 1);
+        this.#listaEst = this.#listaEst.filter(est => est.id != id);
+        // Elimina el id usado por ese estudiante
+        Estudiante.eliminarIdUsado(id);
     }
 
     // Método para buscar estudiantes por nombre en la lista
     buscarEstudiantes(nombre) {
-        // Filtra los estudiantes cuyo nombre contenga la búsqueda (ignora mayúsculas/minúsculas)
-        const resultadosBusqueda = this.#listaEst.filter(est => est.nombre.toLowerCase().includes(nombre.toLowerCase()));
-        
+        // Creamos una constance que busque estudiantes por nombre
+        const resultados = this.#listaEst.filter(est => est.nombre.toLowerCase().includes(nombre.toLowerCase()));
         // Si no se encuentran resultados, lanza un error
-        if(resultadosBusqueda.length === 0){
+        if(resultados == 0){
             throw new Error("No hay resultados");
         }
 
         // Muestra los resultados encontrados en la consola
-        resultadosBusqueda.forEach(est => console.log(est.toString())); 
+        resultados.forEach(est => console.log(est.toString())); 
     }
 
     // Método para obtener el promedio general de las calificaciones de todos los estudiantes
@@ -440,7 +429,7 @@ class ListaEstudiantes{
         // Recorre cada estudiante en la lista
         for (const estudiante of this.#listaEst) {
             // Filtra las asignaturas que tienen calificaciones válidas (números)
-            const notas = estudiante.asignaturas.filter(asign => typeof asign[1] === "number");
+            const notas = estudiante.asignaturas.filter(asign => !isNaN(asign[1]));
             if (notas.length > 0) {
                 // Suma las calificaciones de las asignaturas
                 sumaTotal += notas.reduce((acc, asign) => acc + asign[1], 0);
@@ -450,7 +439,7 @@ class ListaEstudiantes{
         }
     
         // Si no se encontraron calificaciones, lanza un error
-        if (contadorNotas === 0) {
+        if (contadorNotas == 0) {
             throw new Error("No hay calificaciones");
         }
     
@@ -461,7 +450,7 @@ class ListaEstudiantes{
     // Método para ver la lista completa de estudiantes
     verListaEst(){
         // Si la lista de estudiantes está vacía, lanza un error
-        if(this.#listaEst.length === 0){
+        if(this.#listaEst.length == 0){
             throw new Error("No hay estudiantes registrados");
         }
         // Muestra la información de todos los estudiantes en la consola
@@ -497,26 +486,23 @@ class ListaAsignaturas{
     
     // Método para eliminar una asignatura de la lista por su nombre
     eliminarAsignatura(nombreAsign) {
-        // Busca el índice de la asignatura en la lista usando su nombre
-        const indiceAsign = this.#listaAsign.findIndex(asign => asign.nombreAsign === nombreAsign);
-        
         // Si no encuentra la asignatura, lanza un error
-        if(indiceAsign === -1){
+        if(this.#listaAsign.findIndex(asign => asign.nombreAsign === nombreAsign) == -1){
             throw new Error("Dicha asignatura no se encuentra en la lista");
         }else{
             // Si la asignatura está en la lista, la elimina
-            this.#listaAsign.splice(indiceAsign, 1);
+            this.#listaAsign = this.#listaAsign.filter(asign => asign.nombreAsign != nombreAsign);
         }
     }
 
     // Método para ver todas las asignaturas en la lista
     verListaAsign(){
         // Si no hay asignaturas registradas, lanza un error
-        if(this.#listaAsign.length === 0){
+        if(this.#listaAsign.length == 0){
             throw new Error("No hay asignaturas registradas");
         }
         // Muestra las asignaturas de la lista en la consola
-        this.#listaAsign.forEach(asign => console.log(asign.toString()));
+        this.#listaAsign.forEach(asign => console.log(asign.nombreAsign));
     }
 }
 
@@ -564,60 +550,10 @@ try {
     console.log("Error al agregar una asignatura:", err.message);
 }
 
-// Matriculación de estudiantes en algunas asignaturas
-try {
-    // Estudiante 1
-    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[0]);
-    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[1]);
-    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[2]);
-    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[3]);
-    listaEstudiantes.listaEst[0].matricular(listaAsignaturas.listaAsign[4]);
-
-    // Estudiante 2
-    listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[0]);
-    listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[2]);
-    listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[3]);
-    listaEstudiantes.listaEst[1].matricular(listaAsignaturas.listaAsign[4]);
-
-    // Estudiante 3
-    listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[0]);
-    listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[1]);
-    listaEstudiantes.listaEst[2].matricular(listaAsignaturas.listaAsign[2]);
-
-    // Estudiante 4
-    listaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[3]);
-    listaEstudiantes.listaEst[3].matricular(listaAsignaturas.listaAsign[4]);
-} catch (err) {
-    console.log("Error al matricular:", err.message);
-}
-
-// Desmatriculación de estudiantes en algunas asignaturas
-try {
-    // Desmatriculación de asignaturas
-    listaEstudiantes.listaEst[0].desmatricular(listaAsignaturas.listaAsign[3]);
-    listaEstudiantes.listaEst[1].desmatricular(listaAsignaturas.listaAsign[2]);
-    listaEstudiantes.listaEst[2].desmatricular(listaAsignaturas.listaAsign[0]);
-    listaEstudiantes.listaEst[3].desmatricular(listaAsignaturas.listaAsign[4]);
-} catch (err) {
-    console.log("Error al desmatricular:", err.message);
-}
-
-// Calificación de estudiantes en algunas asignaturas
-try {
-    listaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[1], 10);  // Ejemplo con asignatura válida
-    listaEstudiantes.listaEst[0].calificar(listaAsignaturas.listaAsign[2], 7.3);
-
-    listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[0], 9.5);
-    listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[3], 8);
-    listaEstudiantes.listaEst[1].calificar(listaAsignaturas.listaAsign[4], 6.66);
-
-    listaEstudiantes.listaEst[2].calificar(listaAsignaturas.listaAsign[2], 8.2);
-} catch (err) {
-    console.log("Error al calificar:", err.message);
-}
-
-// Función para mostrar el menú principal
-function fnMenu(){
+// Bucle principal del programa para mostrar el menú y ejecutar las opciones
+let salir = true;
+while(salir){
+    // Mostrar el menú principal
     console.log("\n");
     console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
     console.log("1. Crear...");
@@ -629,46 +565,19 @@ function fnMenu(){
     console.log("7. Ver Registros");
     console.log("8. Promedios...");
     console.log("9. Ver Reporte");
-    console.log("0. Salir del sistema");
-}
+    console.log("0. Vete ya de aquí");
 
-// Funciones para crear estudiantes o asignaturas
-function fnCrear(){
-    console.clear();
-    console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
-    console.log("1. Crear estudiante");
-    console.log("2. Crear asignatura");
-    console.log("0. Volver al menú principal");
-}
-
-// Funciones para eliminar estudiantes o asignaturas
-function fnEliminar(){
-    console.clear();
-    console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
-    console.log("1. Eliminar estudiante");
-    console.log("2. Eliminar asignatura");
-    console.log("0. Volver al menú principal");
-}
-
-// Función para ver promedios
-function fnPromedios(){
-    console.clear();
-    console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
-    console.log("1. Promedio estudiantes");
-    console.log("2. Promedio general estudiantes");
-    console.log("0. Volver al menú principal");
-}
-
-// Bucle principal del programa para mostrar el menú y ejecutar las opciones
-let salir = true;
-while(salir){
-    fnMenu();  // Mostrar el menú principal
     opcion = prompt("Selecciona una de estas opciones: ");
 
     switch(opcion){
         case '1': {
             console.clear();
-            fnCrear();  // Mostrar opciones para crear estudiante o asignatura
+            // Mostrar el menú de creaciones
+            console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
+            console.log("1. Crear estudiante");
+            console.log("2. Crear asignatura");
+            console.log("0. Salir");
+
             const optCrear = prompt("Selecciona una de estas opciones: ");
             switch(optCrear){
                 case '1': {
@@ -732,7 +641,7 @@ while(salir){
                 }
 
                 case '0': {
-                    console.log("Saliendo al menú...");
+                    console.log("Saliendo...");
                     salir = false;
                     break;
                 }
@@ -746,7 +655,12 @@ while(salir){
 
         case '2': {
             console.clear();
-            fnEliminar();  // Mostrar opciones para eliminar estudiante o asignatura
+            // Mostrar el menú de eliminaciones
+            console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
+            console.log("1. Eliminar estudiante");
+            console.log("2. Eliminar asignatura");
+            console.log("0. Salir");
+            
             const optEliminar = prompt("Selecciona una de estas opciones: ");
             
             switch(optEliminar){
@@ -757,14 +671,14 @@ while(salir){
                     listaEstudiantes.verListaEst();
 
                     const idSupr = prompt("Elige un estudiante (por ID): ");
-
-                    try {
+                    
+                    try{
                         listaEstudiantes.eliminarEstudiante(idSupr);  // Eliminar estudiante por ID
                         console.log("Estudiante eliminado sin errores");
                         console.log("Lista de estudiantes actualizada: ");
                         listaEstudiantes.verListaEst();
-                    } catch (err) {
-                        console.log("Error durante el proceso de eliminación del estudiante:", err.message);
+                    } catch(err) {
+                        console.log("Error durante el proceso de eliminación del estudiante");
                     }
                     break;
                 }
@@ -789,7 +703,7 @@ while(salir){
                 }
 
                 case '0': {
-                    console.log("Saliendo al menú...");
+                    console.log("Saliendo...");
                     salir = false;
                     break;
                 }
@@ -965,7 +879,12 @@ while(salir){
         // Opción 8: Ver los promedios de los estudiantes
         case '8': {
             console.clear();
-            fnPromedios();  // Mostrar las opciones de promedios
+            // Mostrar el menú de promedios
+            console.log("Sistema de Gestión Académica de Estudiantes y Asignaturas por Adrián Martín Vázquez");
+            console.log("1. Promedio estudiantes");
+            console.log("2. Promedio general estudiantes");
+            console.log("0. Salir");
+
             const optPromedios = prompt("Selecciona una de estas opciones: ");
 
             switch(optPromedios){
@@ -997,7 +916,7 @@ while(salir){
                 }
 
                 case '0': {
-                    console.log("Saliendo al menú...");
+                    console.log("Saliendo...");
                     salir = false;
                     break;
                 }
