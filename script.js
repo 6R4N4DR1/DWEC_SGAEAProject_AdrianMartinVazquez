@@ -19,42 +19,42 @@ class Direccion {
         if (this.#validarCadenas(calle)) {
             this.#calle = calle;
         } else {
-            throw new Error("Especificación de calle no válida");
+            console.log("Especificación de calle no válida");
         }
 
         // Validación del atributo "numero": debe ser mayor a 0
         if (numero > 0) {
             this.#numero = numero;
         } else {
-            throw new Error("Número no válido");
+            console.log("Número no válido");
         }
 
         // Validación del atributo "piso": debe ser una cadena no vacía
         if (this.#validarCadenas(piso)) {
             this.#piso = piso;
         } else {
-            throw new Error("Especificación del piso no válida");
+            console.log("Especificación del piso no válida");
         }
 
         // Validación del atributo "codigoPostal": debe ser un string de 5 dígitos
         if (/^[0-9]{5}$/.test(codigoPostal)) {
             this.#codigoPostal = codigoPostal;
         } else {
-            throw new Error("Código postal incorrecto");
+            console.log("Código postal incorrecto");
         }
 
         // Validación del atributo "provincia": debe ser una cadena no vacía
         if (this.#validarCadenas(provincia)) {
             this.#provincia = provincia;
         } else {
-            throw new Error("Provincia especificada no es válida");
+            console.log("Provincia especificada no es válida");
         }
 
         // Validación del atributo "localidad": debe ser una cadena no vacía
         if (this.#validarCadenas(localidad)) {
             this.#localidad = localidad;
         } else {
-            throw new Error("Localidad especificada no es válida");
+            console.log("Localidad especificada no es válida");
         }
     }
 
@@ -115,21 +115,21 @@ class Persona {
         if (typeof nombre === "string" && /^[a-zA-ZáéíóúüÁÉÍÓÚÜ\s]+$/.test(nombre)) {
             this.#nombre = nombre;
         } else {
-            throw new Error("El nombre solo puede tener letras, tíldes y espacios");
+            console.log("El nombre solo puede tener letras, tíldes y espacios");
         }
 
         // Validación de la edad: debe ser un número entre 1 y 99
         if (edad > 0 && edad < 100 && /^[0-9]+$/.test(edad)) {
             this.#edad = edad;
         } else {
-            throw new Error("La edad solo puede ser entre 1 y 99 años");
+            console.log("La edad solo puede ser entre 1 y 99 años");
         }
 
         // Validación de la dirección: debe ser una instancia de la clase Dirección
         if (direccion instanceof Direccion) {
             this.#direccion = direccion;
         } else {
-            throw new Error("La dirección debe ser una instancia de la clase Dirección, por tanto no es válida");
+            console.log("La dirección debe ser una instancia de la clase Dirección, por tanto no es válida");
         }
     }
 
@@ -192,18 +192,21 @@ class Estudiante extends Persona{
     // Getter para obtener los registros de matriculación y desmatriculación con la fecha de cambio en español
     get registros(){
         return this.#registros.map(([accion, asignatura, fecha]) => {
-            // Inicialización de arrays de días y meses en formato largo y en español
-            const diasESP = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-            const mesesESP = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            // // Inicialización de arrays de días y meses en formato largo y en español
+            // const diasESP = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+            // const mesesESP = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-            // Obtiene el día de la semana, el día del mes, el mes y el año
-            const diaSemana = diasESP[fecha.getDay()];
-            const dia = fecha.getDate();
-            const mes = mesesESP[fecha.getMonth()];
-            const ano = fecha.getFullYear();
+            // // Obtiene el día de la semana, el día del mes, el mes y el año
+            // const diaSemana = diasESP[fecha.getDay()];
+            // const dia = fecha.getDate();
+            // const mes = mesesESP[fecha.getMonth()];
+            // const ano = fecha.getFullYear();
+
+            // Obtengo la fecha actual en formato largo y español
+            const fechaDeAccion = new Intl.DateTimeFormat('es-Es', {dateStyle: 'long'}).format(fecha);
 
             // Devuelve la acción realizada con la fecha formateada
-            return `${accion} en ${asignatura} el ${diaSemana}, ${dia} de ${mes} de ${ano}`;
+            return `${accion} en ${asignatura} el ${fechaDeAccion}`;
         });
     }
 
@@ -211,24 +214,26 @@ class Estudiante extends Persona{
     matricular(asignatura) {
         // Verifica si el estudiante ya está matriculado en la asignatura
         if (this.#asignaturas.some(asign => asign[0].nombreAsign === asignatura.nombreAsign)) {
-            throw new Error("El estudiante ya está matriculado en esta asignatura");
+            console.log("El estudiante ya está matriculado en esta asignatura");
+        }else{
+            // Matricula al estudiante y agrega el registro
+            this.#asignaturas.push([asignatura, []]);
+            const fechaActual = new Date();
+            this.#registros.push(["Matriculado", asignatura.nombreAsign, fechaActual]);
         }
-        // Matricula al estudiante y agrega el registro
-        this.#asignaturas.push([asignatura, "Sin calificar"]);
-        const fechaActual = new Date();
-        this.#registros.push(["Matriculado", asignatura.nombreAsign, fechaActual]);
     }
 
     // Método para desmatricular a un estudiante de una asignatura
     desmatricular(asignatura) {
         // Busca la asignatura en la lista de asignaturas
         if (this.#asignaturas.findIndex(asign => asign[0].nombreAsign === asignatura.nombreAsign) == -1) {
-            throw new Error("El estudiante no está matriculado en esta asignatura");
+            console.log("El estudiante no está matriculado en esta asignatura");
+        }else{
+            // Elimina la asignatura y registra la desmatriculación
+            this.#asignaturas = this.#asignaturas.filter(asign => asign[0].nombre != asignatura.nombre);
+            const fechaActual = new Date();
+            this.#registros.push(["Desmatriculado", asignatura.nombreAsign, fechaActual]);
         }
-        // Elimina la asignatura y registra la desmatriculación
-        this.#asignaturas = this.#asignaturas.filter(asign => asign[0].nombre != asignatura.nombre);
-        const fechaActual = new Date();
-        this.#registros.push(["Desmatriculado", asignatura.nombreAsign, fechaActual]);
     }
 
     // Método para calificar a un estudiante en una asignatura
@@ -236,28 +241,31 @@ class Estudiante extends Persona{
         // Verifica si la asignatura está en la lista de asignaturas del estudiante
         const asignaturaMatriculada = this.#asignaturas.find(asign => asign[0].nombreAsign === asignatura.nombreAsign);
         if (!asignaturaMatriculada) {
-            throw new Error(`El estudiante no está matriculado en la asignatura ${asignatura.nombreAsign}`);
+            console.log(`El estudiante no está matriculado en la asignatura ${asignatura.nombreAsign}`);
         }
         if(nota < 0 || nota > 10){
-            throw new Error("La nota pasada como parámetro no está entre 0 y 10");
+            console.log("La nota pasada como parámetro no está entre 0 y 10");
         }
 
         // Asigna la nota a la asignatura
-        asignaturaMatriculada[1] = nota;
+        asignaturaMatriculada[1].push(nota);
     }
 
     // Getter para calcular el promedio de notas de un estudiante
     promedioEstudiantes() {
-        // Creamos una constante que busca lista las notas de un estudiante
-        const notas = this.#asignaturas.filter(asign => !isNaN(asign[1]));
-        // Filtra las asignaturas que tienen notas numéricas
-        if(notas == 0){
-            return "No hay calificaciones";
+        // Creo una constante inicializada a vacía de array para luego rellenarla con las aisgnaturas calificadas
+        const notas = [];
+        for(const asign of this.#asignaturas){
+            notas.push(...asign[1]);
         }
-
-        // Calcula el promedio de las notas
-        const suma = notas.reduce((acc, asign) => acc + asign[1], 0);
-        return Math.round(suma / notas.length);
+        // Filtra las asignaturas que tienen notas numéricas
+        if(notas.length == 0){
+            return "No hay calificaciones";
+        }else{
+            // Calcula el promedio de las notas
+            const suma = notas.reduce((acc, nota) => acc + nota, 0);
+            return Math.round(suma / notas.length);
+        }
     }
 
     // Método para mostrar los reportes de cada estudiante
@@ -269,7 +277,14 @@ class Estudiante extends Persona{
                 console.log("\t\tNo hay asignaturas calificadas");
             }else{
                 this.#asignaturas.forEach((asign, indice) => {
-                    console.log(`\t\t${indice + 1}. [${asign[0].nombreAsign} - Nota: ${asign[1] || "Sin calificar"}]`);
+                    let notasAsign = "No hay calificaciones hechas";
+                    if(asign[1].length > 0){
+                        notasAsign = asign[1].join(" - ");
+                    }else{
+                        console.log("No hay calificaciones hechas");
+                    }
+
+                    console.log(`\t\t${indice + 1}. [${asign[0].nombreAsign} - Nota: ${notasAsign}]`);
                 });
             }
             console.log(`\tPromedio del alumno (GPA): ${this.promedioEstudiantes()}`);
@@ -281,7 +296,7 @@ class Estudiante extends Persona{
         const numbId = parseInt(id.slice(1));
         // Se valida si idsUsados no contiene ese ID, de lo contrario lo elimina
         if(Estudiante.#idsUsados.findIndex(iU => iU === numbId) == -1){
-            throw new Error("El ID esta libre");
+            console.log("El ID esta libre");
         }else{
             Estudiante.#idsUsados = Estudiante.#idsUsados.filter(iU => iU != numbId);
         }
@@ -289,9 +304,9 @@ class Estudiante extends Persona{
 
     // Muestra un string con la ID y la información del estudiante
     toString() {
-        let verAsignaturas = "Ninguna";
+        let verAsignaturas = "Ninguna asignatura";
         if(this.#asignaturas.length > 0){
-            verAsignaturas = this.#asignaturas.map(([asign, nota]) => `${asign.nombreAsign} - Nota: ${nota ?? "Sin calificar"}`).join(" | ");
+            verAsignaturas = this.#asignaturas.map(([asign, notas]) => `${asign.nombreAsign} - Nota: ${notas.join(" - ") || "No hay calificaciones hechas"}`).join(" | ");
         }
         return `${this.#id} -> ${super.toString()}. \n Asignaturas del estudiante: [${verAsignaturas}]`;
     }
@@ -313,7 +328,7 @@ class Asignatura{
             this.#nombreAsign = nombreAsign; // Asigna el nombre si es válido
         }else{
             // Si el nombre no es válido, lanza un error
-            throw new Error("El nombre de la asignatura solo puede contener letras, tíldes, espacios y numeros romanos");
+            console.log("El nombre de la asignatura solo puede contener letras, tíldes, espacios y numeros romanos");
         }
 
         this.#calificaciones = []; // Inicializa el array de calificaciones vacío
@@ -331,7 +346,7 @@ class Asignatura{
             this.#calificaciones.push(nota); // Si es válida, la agrega al array
         } else {
             // Si la calificación no es válida, lanza un error
-            throw new Error("La calificación debe ser un número entero entre 0 y 10");
+            console.log("La calificación debe ser un número entero entre 0 y 10");
         }
     }
 
@@ -339,7 +354,7 @@ class Asignatura{
     promedioAsignaturas() {
         // Si no hay calificaciones, retorna 0
         if(this.#calificaciones.length == 0){
-            return 0;
+            return "No hay calificaciones";
         } else {
             // Si hay calificaciones, calcula el promedio
             const suma = this.#calificaciones.reduce((acc, nota) => acc + nota, 0); // Suma todas las calificaciones
@@ -352,10 +367,10 @@ class Asignatura{
         // Si la calificación no está en el array, lanza un error
         if (this.#calificaciones.indexOf(nota) == -1) {
             throw new Error(`La calificación ${nota} no se encuentra en la asignatura ${this.#nombreAsign}`);
+        }else{
+            // Si la calificación está en el array, la elimina
+            this.#calificaciones = this.#calificaciones.filter(cal => cal != nota);
         }
-
-        // Si la calificación está en el array, la elimina
-        this.#calificaciones = this.#calificaciones.filter(cal => cal != nota);
     }
 
     // Método que convierte la asignatura a un formato de texto (string)
@@ -383,7 +398,7 @@ class ListaEstudiantes{
         // Verifica si el estudiante ya está en la lista por su id
         if (this.#listaEst.some(est => est.id === estudiante.id)) {
             // Si el estudiante ya existe, lanza un error
-            throw new Error("El estudiante ya está en la lista.");
+            console.log("El estudiante ya está en la lista.");
         } else {
             // Si no está, lo agrega a la lista
             this.#listaEst.push(estudiante);
@@ -394,13 +409,13 @@ class ListaEstudiantes{
     eliminarEstudiante(id) {
         // Si el estudiante no está en la lista, lanza un error
         if(this.#listaEst.findIndex(est => est.id === id) == -1){
-            throw new Error("El estudiante no está en la lista");
+            console.log("El estudiante no está en la lista");
+        }else{
+            // Elimina el estudiante encontrado en el índice
+            this.#listaEst = this.#listaEst.filter(est => est.id != id);
+            // Elimina el id usado por ese estudiante
+            Estudiante.eliminarIdUsado(id);
         }
-
-        // Elimina el estudiante encontrado en el índice
-        this.#listaEst = this.#listaEst.filter(est => est.id != id);
-        // Elimina el id usado por ese estudiante
-        Estudiante.eliminarIdUsado(id);
     }
 
     // Método para buscar estudiantes por nombre en la lista
@@ -409,52 +424,62 @@ class ListaEstudiantes{
         const resultados = this.#listaEst.filter(est => est.nombre.toLowerCase().includes(nombre.toLowerCase()));
         // Si no se encuentran resultados, lanza un error
         if(resultados == 0){
-            throw new Error("No hay resultados");
+            console.log("No hay resultados");
+        }else{
+            // Muestra los resultados encontrados en la consola
+            resultados.forEach(est => console.log(est.toString())); 
         }
-
-        // Muestra los resultados encontrados en la consola
-        resultados.forEach(est => console.log(est.toString())); 
     }
 
     // Método para obtener el promedio general de las calificaciones de todos los estudiantes
     promedioGeneral(){
         // Si no hay estudiantes en la lista, lanza un error
         if (this.#listaEst.length === 0) {
-            throw new Error("No hay estudiantes registrados en la lista");
-        }
-    
-        let sumaTotal = 0; // Variable para almacenar la suma total de las calificaciones
-        let contadorNotas = 0; // Variable para contar cuántas calificaciones se suman
-    
-        // Recorre cada estudiante en la lista
-        for (const estudiante of this.#listaEst) {
-            // Filtra las asignaturas que tienen calificaciones válidas (números)
-            const notas = estudiante.asignaturas.filter(asign => !isNaN(asign[1]));
-            if (notas.length > 0) {
-                // Suma las calificaciones de las asignaturas
-                sumaTotal += notas.reduce((acc, asign) => acc + asign[1], 0);
-                // Cuenta el número total de calificaciones
-                contadorNotas += notas.length;
+            console.log("No hay estudiantes registrados en la lista");
+            return "No hay calificaciones";
+        }else{
+            let sumaTotal = 0; // Variable para almacenar la suma total de las calificaciones
+            let contadorNotas = 0; // Variable para contar cuántas calificaciones se suman
+        
+            // Recorre cada estudiante en la lista
+            for(const estudiante of this.#listaEst){
+                const notas = [];
+
+                for(const asign of estudiante.asignaturas){
+                    notas.push(...asign[1]);
+                }
+
+                if (notas.length > 0) {
+                    // Suma las calificaciones de las asignaturas
+                    sumaTotal += notas.reduce((acc, nota) => acc + nota, 0);
+                    // Cuenta el número total de calificaciones
+                    contadorNotas += notas.length;
+                }else{
+                    console.log("El estudiante no tiene asignaturas calificadas");
+                    return "No hay calificaciones";
+                }
             }
-        }
-    
-        // Si no se encontraron calificaciones, lanza un error
-        if (contadorNotas == 0) {
-            throw new Error("No hay calificaciones");
-        }
-    
-        // Devuelve el promedio redondeado de las calificaciones
-        return Math.round(sumaTotal / contadorNotas);
+        
+            // Si no se encontraron calificaciones, lanza un error
+            if (contadorNotas == 0) {
+                return "No hay calificaciones";
+            }else{
+                // Devuelve el promedio redondeado de las calificaciones
+                return Math.round(sumaTotal / contadorNotas);
+            }
+        } 
     }
 
     // Método para ver la lista completa de estudiantes
     verListaEst(){
         // Si la lista de estudiantes está vacía, lanza un error
         if(this.#listaEst.length == 0){
-            throw new Error("No hay estudiantes registrados");
+            console.log("No hay estudiantes registrados");
+        }else{
+            // Muestra la información de todos los estudiantes en la consola
+            this.#listaEst.forEach(est => console.log(est.toString()));
         }
-        // Muestra la información de todos los estudiantes en la consola
-        this.#listaEst.forEach(est => console.log(est.toString()));
+        
     }
 }
 
@@ -477,7 +502,7 @@ class ListaAsignaturas{
         // Verifica si la asignatura ya está en la lista comparando su nombre
         if (this.#listaAsign.some(asign => asign.nombreAsign === asignatura.nombreAsign)) {
             // Si la asignatura ya existe, lanza un error
-            throw new Error("La asignatura ya está en la lista");
+            console.log("La asignatura ya está en la lista");
         } else {
             // Si no está en la lista, la agrega
             this.#listaAsign.push(asignatura);
@@ -488,7 +513,7 @@ class ListaAsignaturas{
     eliminarAsignatura(nombreAsign) {
         // Si no encuentra la asignatura, lanza un error
         if(this.#listaAsign.findIndex(asign => asign.nombreAsign === nombreAsign) == -1){
-            throw new Error("Dicha asignatura no se encuentra en la lista");
+            console.log("Dicha asignatura no se encuentra en la lista");
         }else{
             // Si la asignatura está en la lista, la elimina
             this.#listaAsign = this.#listaAsign.filter(asign => asign.nombreAsign != nombreAsign);
@@ -499,10 +524,11 @@ class ListaAsignaturas{
     verListaAsign(){
         // Si no hay asignaturas registradas, lanza un error
         if(this.#listaAsign.length == 0){
-            throw new Error("No hay asignaturas registradas");
+            console.log("No hay asignaturas registradas");
+        }else{
+            // Muestra las asignaturas de la lista en la consola
+            this.#listaAsign.forEach(asign => console.log(asign.nombreAsign));
         }
-        // Muestra las asignaturas de la lista en la consola
-        this.#listaAsign.forEach(asign => console.log(asign.nombreAsign));
     }
 }
 
@@ -724,7 +750,7 @@ while(salir){
 
             const estudiante = listaEstudiantes.listaEst.find(est => est.id === id);  // Buscar el estudiante por ID
             if(!estudiante){
-                throw new Error("No está el estudiante en la lista");
+                console.log("No está el estudiante en la lista");
                 break;
             }
 
@@ -734,7 +760,7 @@ while(salir){
 
             const asignatura = listaAsignaturas.listaAsign.find(asign => asign.nombreAsign === nombreAsign);  // Buscar la asignatura por nombre
             if(!asignatura){
-                throw new Error("No está la asignatura en la lista");
+                console.log("No está la asignatura en la lista");
                 break;
             }
 
@@ -756,7 +782,7 @@ while(salir){
             const estudiante =  listaEstudiantes.listaEst.find(est => est.id === id);  // Buscar el estudiante por ID
 
             if(!estudiante){
-                throw new Error("No está el estudiante en la lista");
+                console.log("No está el estudiante en la lista");
                 break;
             }
 
@@ -770,7 +796,7 @@ while(salir){
             const asignatura = estudiante.asignaturas[indiceAsignatura - 1];  // Obtener la asignatura por índice
 
             if(!asignatura){
-                throw new Error("No hay ninguna asignatura de este tipo matriculada a este estudiante");
+                console.log("No hay ninguna asignatura de este tipo matriculada a este estudiante");
                 break;
             }
 
@@ -792,7 +818,7 @@ while(salir){
             
             const estudiante = listaEstudiantes.listaEst.find(est => est.id === id);  // Buscar el estudiante por ID
             if(!estudiante){
-                throw new Error("El estudiante no se encuentra en la lista");
+                console.log("El estudiante no se encuentra en la lista");
                 break;
             }
 
@@ -800,15 +826,15 @@ while(salir){
             const asignatura = listaAsignaturas.listaAsign.find(asign => asign.nombreAsign === nombreAsign);  // Buscar la asignatura por nombre
             
             if(!asignatura){
-                throw new Error("La asignatura no se encuentra en la lista");
+                console.log("La asignatura no se encuentra en la lista");
                 break;
             }
 
             const nota = prompt("Escribe una nota para la calificación: ");
             const notaDecimal = parseFloat(nota);
 
-            if(notaDecimal < 0 || notaDecimal > 10){
-                throw new Error("La calificación tiene que estar entre 0 y 10");
+            if(isNaN(notaDecimal) || notaDecimal < 0 || notaDecimal > 10){
+                console.log("La calificación tiene que estar entre 0 y 10");
                 break;
             }
 
@@ -862,7 +888,7 @@ while(salir){
 
             const estudiante = listaEstudiantes.listaEst.find(est => est.id === id);  // Buscar el estudiante por ID
             if(!estudiante){
-                throw new Error("El estudiante descrito no está en la lista");
+                console.log("El estudiante descrito no está en la lista");
                 break;
             }
 
@@ -896,11 +922,16 @@ while(salir){
                     const estudiante = listaEstudiantes.listaEst.find(est => est.id === id);  // Buscar el estudiante por ID
                     
                     if(!estudiante){
-                        throw new Error("El estudiante no se encuentra en la lista");
+                        console.log("El estudiante no se encuentra en la lista");
                         break;
                     }
 
-                    console.log(`Promedio (GPA) de ${estudiante.nombre}: ${estudiante.promedioEstudiantes()}`);  // Mostrar el promedio del estudiante
+                    const promedio = estudiante.promedioEstudiantes();
+                    if(promedio == "No hay calificaciones"){
+                        console.log("Este estudiante no tiene calificaciones");
+                    }else{
+                        console.log(`Promedio (GPA) de ${estudiante.nombre}: ${promedio}`);  // Mostrar el promedio del estudiante
+                    }
                     break;
                 }
 
@@ -908,7 +939,11 @@ while(salir){
                     console.clear();
                     try{
                         const gpaGeneral = listaEstudiantes.promedioGeneral();  // Calcular el promedio general de todos los estudiantes
-                        console.log(`Promedio general de notas de todos los estudiantes: ${gpaGeneral}`);
+                        if (gpaGeneral == "No hay calificaciones"){
+                            console.log("No hay calificaciones, no se puede hacer el promedio general de estudiantes");
+                        }else{
+                            console.log(`Promedio general de notas de todos los estudiantes: ${gpaGeneral}`);
+                        }
                     } catch (err) {
                         console.log(err.message);
                     }
@@ -938,7 +973,7 @@ while(salir){
             const estudiante = listaEstudiantes.listaEst.find(est => est.id === id);  // Buscar el estudiante por ID
 
             if(!estudiante){
-                throw new Error("El estudiante no se encuentra en la lista");
+                console.log("El estudiante no se encuentra en la lista");
                 break;
             }
 
